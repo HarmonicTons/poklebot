@@ -1,3 +1,4 @@
+import { orderBy, sumBy } from "lodash";
 import { getAllValidFlops, brutForceSolution, Players } from "./brutForce";
 
 const players: Players = [
@@ -80,8 +81,75 @@ const players2: Players = [
 
 const main = async () => {
   console.log("Start");
-  const rivers = brutForceSolution(players2);
-  console.log(rivers[0]);
+  const { boards, cards } = brutForceSolution(players);
+
+  const turnCardsWithEntropy = cards.map((card) => {
+    const outcomes = boards.reduce(
+      (res, board) => {
+        if (board[3][0] === card[0] && board[3][1] === card[1]) {
+          res[0]++;
+          return res;
+        }
+        if (board[3][0] === card[0] || board[3][1] === card[1]) {
+          res[1]++;
+          return res;
+        }
+        res[2]++;
+        return res;
+      },
+      [0, 0, 0]
+    );
+
+    const probabilities = outcomes.map(
+      (nbOfOccurences) => nbOfOccurences / boards.length
+    );
+
+    const entropy = sumBy(probabilities, (p) =>
+      p === 0 ? 0 : p * Math.log2(1 / p)
+    );
+    return { card, entropy };
+  });
+  const sortedTurnCardsByEntropy = orderBy(
+    turnCardsWithEntropy,
+    "entropy",
+    "desc"
+  );
+  const bestTurnChoice = sortedTurnCardsByEntropy[0].card;
+  console.log("turn", bestTurnChoice);
+
+  const riverCardsWithEntropy = cards.map((card) => {
+    const outcomes = boards.reduce(
+      (res, board) => {
+        if (board[4][0] === card[0] && board[4][1] === card[1]) {
+          res[0]++;
+          return res;
+        }
+        if (board[4][0] === card[0] || board[4][1] === card[1]) {
+          res[1]++;
+          return res;
+        }
+        res[2]++;
+        return res;
+      },
+      [0, 0, 0]
+    );
+
+    const probabilities = outcomes.map(
+      (nbOfOccurences) => nbOfOccurences / boards.length
+    );
+
+    const entropy = sumBy(probabilities, (p) =>
+      p === 0 ? 0 : p * Math.log2(1 / p)
+    );
+    return { card, entropy };
+  });
+  const sortedRiverCardsByEntropy = orderBy(
+    riverCardsWithEntropy,
+    "entropy",
+    "desc"
+  );
+  const bestRiverChoice = sortedRiverCardsByEntropy[0].card;
+  console.log("river", bestRiverChoice);
 };
 
 main()

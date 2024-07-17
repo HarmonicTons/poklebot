@@ -27,7 +27,9 @@ export type Players = [Player, Player, Player];
 
 export type FlopCards = [Card, Card, Card];
 
-export const brutForceSolution = (players: Players): BoardCards[] => {
+export const brutForceSolution = (
+  players: Players
+): { boards: BoardCards[]; cards: Card[] } => {
   const validCards = getValidCards(players);
 
   const flops = getAllValidFlops(players, validCards);
@@ -38,7 +40,7 @@ export const brutForceSolution = (players: Players): BoardCards[] => {
 
   const validBoards = filterOutBoardsContainingKickers(players, boards);
 
-  return validBoards;
+  return { boards: validBoards, cards: validCards };
 };
 
 export const getValidCards = (players: Players): Card[] => {
