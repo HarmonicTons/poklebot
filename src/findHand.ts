@@ -102,7 +102,7 @@ export const getEncodedHandType = (handType: HandType): EncodedHandType => {
 
 export type HandScore = string;
 
-export const findHandType = (
+export const findHandTypeSimple = (
   handCards: HandCards
 ): {
   handType: EncodedHandType;
@@ -268,4 +268,28 @@ export const getAllHandsOutOf7Cards = (cards: Card[]): HandCards[] => {
     }
   }
   return hands;
+};
+
+export const findHandType = (
+  cards: Card[]
+): {
+  handType: EncodedHandType;
+  scoringCards: Card[];
+  kickers: Card[];
+  handScore: HandScore;
+} => {
+  if (cards.length === 5) {
+    return findHandTypeSimple(cards as HandCards);
+  }
+  if (cards.length === 6) {
+    const hands = getAllHandsOutOf6Cards(cards);
+    const handsWithTypes = hands.map((hand) => findHandTypeSimple(hand));
+    return orderBy(handsWithTypes, "handScore", "desc")[0];
+  }
+  if (cards.length === 7) {
+    const hands = getAllHandsOutOf7Cards(cards);
+    const handsWithTypes = hands.map((hand) => findHandTypeSimple(hand));
+    return orderBy(handsWithTypes, "handScore", "desc")[0];
+  }
+  throw new Error("Invalid number of cards");
 };

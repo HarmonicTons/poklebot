@@ -5,6 +5,8 @@ import {
   findHandType,
   getAllHandsOutOf6Cards,
   getAllHandsOutOf7Cards,
+  getEncodedHandType,
+  HandCards,
 } from "./findHand";
 
 export type PlayerCards = [Card, Card];
@@ -34,7 +36,7 @@ export const brutForceSolution = (players: Players): BoardCards[] => {
 
   const boards = getAllValidRivers(players, validCards, turns);
 
-  const validBoards = filterOutBoardsContainingKickers(boards);
+  const validBoards = filterOutBoardsContainingKickers(players, boards);
 
   return validBoards;
 };
@@ -125,7 +127,6 @@ export const getAllValidFlops = (
       const c2 = validCards[ci2];
       for (let ci3 = ci2 + 1; ci3 < validCards.length; ci3++) {
         const c3 = validCards[ci3];
-        n++;
         const flopCards: FlopCards = [c1, c2, c3];
 
         const p1Score = findHandType([
@@ -141,6 +142,7 @@ export const getAllValidFlops = (
           ...flopCards,
         ]).handScore;
 
+        n++;
         if (
           areScoreValids(
             [
@@ -149,12 +151,10 @@ export const getAllValidFlops = (
               players[2].positions.flop,
             ],
             [p1Score, p2Score, p3Score]
-          ) === false
+          ) === true
         ) {
-          continue;
+          flops.push(flopCards);
         }
-
-        flops.push(flopCards);
       }
     }
   }
@@ -186,24 +186,13 @@ export const getAllValidTurns = (
       const turnCards: TurnCards = [...flop, c1];
 
       const p1Cards = [...players[0].cards, ...turnCards];
-      const p1Hands = getAllHandsOutOf6Cards(p1Cards);
-      const p1Scores = p1Hands.map((hand) => findHandType(hand).handScore);
-      const p1Score = p1Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p1Score = findHandType(p1Cards).handScore;
       const p2Cards = [...players[1].cards, ...turnCards];
-      const p2Hands = getAllHandsOutOf6Cards(p2Cards);
-      const p2Scores = p2Hands.map((hand) => findHandType(hand).handScore);
-      const p2Score = p2Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p2Score = findHandType(p2Cards).handScore;
       const p3Cards = [...players[2].cards, ...turnCards];
-      const p3Hands = getAllHandsOutOf6Cards(p3Cards);
-      const p3Scores = p3Hands.map((hand) => findHandType(hand).handScore);
-      const p3Score = p3Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p3Score = findHandType(p3Cards).handScore;
 
+      n++;
       if (
         areScoreValids(
           [
@@ -212,12 +201,10 @@ export const getAllValidTurns = (
             players[2].positions.turn,
           ],
           [p1Score, p2Score, p3Score]
-        ) === false
+        ) === true
       ) {
-        continue;
+        turns.push(turnCards);
       }
-
-      turns.push(turnCards);
     }
   }
 
@@ -243,29 +230,17 @@ export const getAllValidRivers = (
       if (isUsed) {
         continue;
       }
-      n++;
 
       const riverCards: BoardCards = [...turn, c1];
 
       const p1Cards = [...players[0].cards, ...riverCards];
-      const p1Hands = getAllHandsOutOf7Cards(p1Cards);
-      const p1Scores = p1Hands.map((hand) => findHandType(hand).handScore);
-      const p1Score = p1Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p1Score = findHandType(p1Cards).handScore;
       const p2Cards = [...players[1].cards, ...riverCards];
-      const p2Hands = getAllHandsOutOf7Cards(p2Cards);
-      const p2Scores = p2Hands.map((hand) => findHandType(hand).handScore);
-      const p2Score = p2Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p2Score = findHandType(p2Cards).handScore;
       const p3Cards = [...players[2].cards, ...riverCards];
-      const p3Hands = getAllHandsOutOf7Cards(p3Cards);
-      const p3Scores = p3Hands.map((hand) => findHandType(hand).handScore);
-      const p3Score = p3Scores.reduce((best, score) => {
-        return best > score ? best : score;
-      });
+      const p3Score = findHandType(p3Cards).handScore;
 
+      n++;
       if (
         areScoreValids(
           [
@@ -274,12 +249,10 @@ export const getAllValidRivers = (
             players[2].positions.river,
           ],
           [p1Score, p2Score, p3Score]
-        ) === false
+        ) === true
       ) {
-        continue;
+        rivers.push(riverCards);
       }
-
-      rivers.push(riverCards);
     }
   }
 
@@ -294,7 +267,62 @@ export const getAllValidRivers = (
  * "part of a hand" means the significant card(s) in: Pair, Two Pair, Three of a Kind or Four of a Kind (not kickers)
  */
 export const filterOutBoardsContainingKickers = (
+  players: Players,
   boards: BoardCards[]
 ): BoardCards[] => {
-  return boards;
+  let n = 0;
+  const filteredBoards: BoardCards[] = [];
+  for (const board of boards) {
+    const kickers = [...board];
+
+    const flopCards = board.slice(0, 3);
+    const turnCards = board.slice(0, 4);
+    const riverCards = [...board];
+
+    for (const player of players) {
+      if (kickers.length === 0) {
+        break;
+      }
+      kickers.forEach((kicker) => {
+        if (
+          kicker[0] === player.cards[0][0] ||
+          kicker[0] === player.cards[1][0]
+        ) {
+          kickers.splice(kickers.indexOf(kicker), 1);
+        }
+      });
+      for (const cards of [flopCards, turnCards, riverCards]) {
+        if (kickers.length === 0) {
+          break;
+        }
+        const allCards = [...cards, ...player.cards];
+        const { handType, scoringCards: playerScoringCards } =
+          findHandType(allCards);
+
+        if (
+          handType === getEncodedHandType("ST") ||
+          handType === getEncodedHandType("SF")
+        ) {
+          playerScoringCards.forEach((scoringCard) => {
+            kickers.forEach((kicker) => {
+              if (
+                kicker[0] === scoringCard[0] ||
+                kicker[0] === scoringCard[0]
+              ) {
+                kickers.splice(kickers.indexOf(kicker), 1);
+              }
+            });
+          });
+        }
+      }
+    }
+    n++;
+    if (kickers.length === 0) {
+      filteredBoards.push(board);
+    }
+  }
+
+  console.log(`kickers-out: ${filteredBoards.length}/${n}`);
+
+  return filteredBoards;
 };

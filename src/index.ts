@@ -80,7 +80,8 @@ const players2: Players = [
 
 const main = async () => {
   console.log("Start");
-  const rivers = brutForceSolution(players);
+  const rivers = brutForceSolution(players2);
+  console.log(rivers[0]);
 };
 
 main()
