@@ -1,13 +1,9 @@
 import {
   Card,
   CARD_COLORS,
-  cardsAreEqual,
   ENCODED_CARD_VALUES,
   findHandType,
-  getAllHandsOutOf6Cards,
-  getAllHandsOutOf7Cards,
   getEncodedHandType,
-  HandCards,
 } from "./findHand";
 
 export type PlayerCards = [Card, Card];

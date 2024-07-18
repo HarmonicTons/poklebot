@@ -1,5 +1,5 @@
 import { BoardCards } from "./brutForce";
-import { getFlopRecommendation, getFlopsWithEntropy } from "./entropy";
+import { getFlopRecommendation } from "./entropy";
 import { Card } from "./findHand";
 
 describe("entropy", () => {

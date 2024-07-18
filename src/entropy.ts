@@ -1,7 +1,6 @@
 import { orderBy, sumBy } from "lodash";
 import { BoardCards, FlopCards } from "./brutForce";
 import { Card, cardsAreEqual } from "./findHand";
-import { Flop } from "./model";
 
 export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];

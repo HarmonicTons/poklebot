@@ -2,11 +2,8 @@ import { BoardCards, brutForceSolution, Players } from "./brutForce";
 import {
   ActualOutcome,
   filterBoards,
-  getFlopRecommendation,
   getHardModeRecommendation,
   getRecommendation,
-  getRiverRecommendation,
-  getTurnRecommendation,
 } from "./entropy";
 
 const players: Players = [
