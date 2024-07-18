@@ -74,10 +74,6 @@ export type CardHexArray = [HexCardRank, CardSuit];
 export class Card {
   constructor(public rank: CardRank, public suit: CardSuit) {}
 
-  public toString(): CardString {
-    return `${this.rank}${this.suit}`;
-  }
-
   public isEqual(card: Card) {
     return this.rank === card.rank && this.suit === card.suit;
   }
@@ -90,8 +86,16 @@ export class Card {
     return orderBy(cards, "hexRank", "desc");
   }
 
+  public toString(): CardString {
+    return `${this.rank}${this.suit}`;
+  }
+
   public static fromString(str: CardString): Card {
     return new Card(str[0] as CardRank, str[1] as CardSuit);
+  }
+
+  public toHexArray(): CardHexArray {
+    return [this.hexRank, this.suit];
   }
 
   public static fromHexArray([rank, suit]: CardHexArray): Card {

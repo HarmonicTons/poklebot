@@ -1,5 +1,4 @@
-import { BoardCards } from "./brutForce";
-import { getFlopRecommendation } from "./entropy";
+import { getFlopRecommendation, OldBoardCards } from "./entropy";
 import { CardHexArray, CardSuit, HexCardRank } from "./poker/Card";
 
 type CardType = CardHexArray;
@@ -54,7 +53,7 @@ describe("entropy", () => {
       ["e", "♥"],
       ["e", "♦"],
     ];
-    const boards: BoardCards[] = [
+    const boards: OldBoardCards[] = [
       [
         ["7", "♠"],
         ["7", "♦"],
