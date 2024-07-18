@@ -204,8 +204,8 @@ export const getRiverRecommendation = (
 export const boardIsValid = (board: BoardCards): boolean => {
   for (let i = 0; i < board.length; i++) {
     for (let j = i + 1; j < board.length; j++) {
-      const c1 = Card.fromString(board[i].join("") as any);
-      const c2 = Card.fromString(board[j].join("") as any);
+      const c1 = Card.fromHexArray(board[i]);
+      const c2 = Card.fromHexArray(board[j]);
       if (c1.isEqual(c2)) {
         return false;
       }

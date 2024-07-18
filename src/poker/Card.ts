@@ -48,6 +48,21 @@ export const hexCardRankRecord: Record<CardRank, HexCardRank> = {
   K: "d",
   A: "e",
 };
+const cardRankRecord: Record<HexCardRank, CardRank> = {
+  "2": "2",
+  "3": "3",
+  "4": "4",
+  "5": "5",
+  "6": "6",
+  "7": "7",
+  "8": "8",
+  "9": "9",
+  a: "10",
+  b: "J",
+  c: "Q",
+  d: "K",
+  e: "A",
+};
 
 export const CARD_SUITS = ["♠", "♣", "♥", "♦"] as const;
 export type CardSuit = (typeof CARD_SUITS)[number];
@@ -75,5 +90,9 @@ export class Card {
 
   public static fromString(str: CardString): Card {
     return new Card(str[0] as CardRank, str[1] as CardSuit);
+  }
+
+  public static fromHexArray([rank, suit]: [HexCardRank, CardSuit]): Card {
+    return new Card(cardRankRecord[rank], suit);
   }
 }

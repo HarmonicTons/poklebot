@@ -2,6 +2,8 @@ import {
   areScoreValids,
   BoardCards,
   filterOutBoardsContainingKickers,
+  FlopCards,
+  isFlopValid,
   Players,
 } from "./brutForce";
 
@@ -130,5 +132,57 @@ describe("are score valid", () => {
     expect(areScoreValids([3, 1, 2], ["2cc776", "6ccc77", "6777cc"])).toBe(
       true
     );
+  });
+});
+
+describe("is flop valid", () => {
+  it("should be valid", () => {
+    const flopCards: FlopCards = [
+      ["2", "♣"],
+      ["2", "♥"],
+      ["9", "♣"],
+    ];
+
+    const players: Players = [
+      {
+        name: "Bex",
+        positions: {
+          flop: 2,
+          turn: 3,
+          river: 1,
+        },
+        cards: [
+          ["e", "♥"],
+          ["e", "♦"],
+        ],
+      },
+      {
+        name: "Rex",
+        positions: {
+          flop: 1,
+          turn: 2,
+          river: 3,
+        },
+        cards: [
+          ["2", "♠"],
+          ["d", "♠"],
+        ],
+      },
+      {
+        name: "Lex",
+        positions: {
+          flop: 3,
+          turn: 1,
+          river: 2,
+        },
+        cards: [
+          ["c", "♣"],
+          ["9", "♠"],
+        ],
+      },
+    ];
+
+    const isValid = isFlopValid(flopCards, players);
+    expect(isValid).toBe(true);
   });
 });

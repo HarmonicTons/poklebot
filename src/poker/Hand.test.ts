@@ -275,5 +275,17 @@ describe("Hand", () => {
       const bestHand = Hand.getBestHand(handCards);
       expect(bestHand.hexScore).toBe("7cccc8");
     });
+
+    it("another flop", () => {
+      const handCards: Card[] = [
+        new Card("2", "♣"),
+        new Card("2", "♥"),
+        new Card("9", "♣"),
+        new Card("A", "♥"),
+        new Card("A", "♦"),
+      ];
+      const bestHand = Hand.getBestHand(handCards);
+      expect(bestHand.hexScore).toBe("2ee229");
+    });
   });
 });

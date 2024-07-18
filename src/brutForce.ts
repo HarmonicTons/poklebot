@@ -118,6 +118,30 @@ export const areScoreValids = (
   return true;
 };
 
+export const isFlopValid = (
+  flopCards: FlopCards,
+  players: Players
+): boolean => {
+  const p1Score = Hand.getBestHand(
+    [...players[0].cards, ...flopCards].map((c) => Card.fromHexArray(c))
+  ).hexScore;
+  const p2Score = Hand.getBestHand(
+    [...players[1].cards, ...flopCards].map((c) => Card.fromHexArray(c))
+  ).hexScore;
+  const p3Score = Hand.getBestHand(
+    [...players[2].cards, ...flopCards].map((c) => Card.fromHexArray(c))
+  ).hexScore;
+
+  return areScoreValids(
+    [
+      players[0].positions.flop,
+      players[1].positions.flop,
+      players[2].positions.flop,
+    ],
+    [p1Score, p2Score, p3Score]
+  );
+};
+
 export const getAllValidFlops = (
   players: Players,
   validCards: CardType[]
@@ -134,19 +158,13 @@ export const getAllValidFlops = (
         const flopCards: FlopCards = [c1, c2, c3];
 
         const p1Score = Hand.getBestHand(
-          [...players[0].cards, ...flopCards].map((c) =>
-            Card.fromString(c.join("") as CardString)
-          )
+          [...players[0].cards, ...flopCards].map((c) => Card.fromHexArray(c))
         ).hexScore;
         const p2Score = Hand.getBestHand(
-          [...players[1].cards, ...flopCards].map((c) =>
-            Card.fromString(c.join("") as CardString)
-          )
+          [...players[1].cards, ...flopCards].map((c) => Card.fromHexArray(c))
         ).hexScore;
         const p3Score = Hand.getBestHand(
-          [...players[2].cards, ...flopCards].map((c) =>
-            Card.fromString(c.join("") as CardString)
-          )
+          [...players[2].cards, ...flopCards].map((c) => Card.fromHexArray(c))
         ).hexScore;
 
         n++;
@@ -194,15 +212,15 @@ export const getAllValidTurns = (
 
       const p1Cards = [...players[0].cards, ...turnCards];
       const p1Score = Hand.getBestHand(
-        p1Cards.map((c) => Card.fromString(c.join("") as any))
+        p1Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
       const p2Cards = [...players[1].cards, ...turnCards];
       const p2Score = Hand.getBestHand(
-        p2Cards.map((c) => Card.fromString(c.join("") as any))
+        p2Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
       const p3Cards = [...players[2].cards, ...turnCards];
       const p3Score = Hand.getBestHand(
-        p3Cards.map((c) => Card.fromString(c.join("") as any))
+        p3Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
 
       n++;
@@ -248,15 +266,15 @@ export const getAllValidRivers = (
 
       const p1Cards = [...players[0].cards, ...riverCards];
       const p1Score = Hand.getBestHand(
-        p1Cards.map((c) => Card.fromString(c.join("") as any))
+        p1Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
       const p2Cards = [...players[1].cards, ...riverCards];
       const p2Score = Hand.getBestHand(
-        p2Cards.map((c) => Card.fromString(c.join("") as any))
+        p2Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
       const p3Cards = [...players[2].cards, ...riverCards];
       const p3Score = Hand.getBestHand(
-        p3Cards.map((c) => Card.fromString(c.join("") as any))
+        p3Cards.map((c) => Card.fromHexArray(c))
       ).hexScore;
 
       n++;
@@ -313,7 +331,7 @@ export const filterOutBoardsContainingKickers = (
       for (const cards of [flopCards, turnCards, riverCards]) {
         const allCards = [...cards, ...player.cards];
         const hand = Hand.getBestHand(
-          allCards.map((c) => Card.fromString(c.join("") as any))
+          allCards.map((c) => Card.fromHexArray(c))
         );
 
         if (hand.rank === "ST" || hand.rank === "SF") {
