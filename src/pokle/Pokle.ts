@@ -19,6 +19,18 @@ export type Player = {
 
 export type Players = [Player, Player, Player];
 
+const CARD_PATTERNS = ["🟩", "🟨", "⬜️"] as const;
+export type CardPattern = (typeof CARD_PATTERNS)[number];
+
+export type FlopPattern = [CardPattern, CardPattern, CardPattern];
+export type BoardPattern = [
+  CardPattern,
+  CardPattern,
+  CardPattern,
+  CardPattern,
+  CardPattern
+];
+
 export class Pokle {
   public validCards: Card[];
   constructor(public readonly players: Players) {
@@ -231,5 +243,83 @@ export class Pokle {
     const rivers = this.getAllPossibleRivers({ turns });
     const boards = this.keepOnlyValidBoards({ rivers });
     return boards;
+  }
+
+  public static getCardPattern(card1: Card, card2: Card): CardPattern {
+    if (card1.isEqual(card2)) {
+      return "🟩";
+    }
+    if (card1.rank === card2.rank || card1.suit === card2.suit) {
+      return "🟨";
+    }
+    return "⬜️";
+  }
+
+  public static getFlopCardPattern(
+    card: Card,
+    actualFlop: FlopCards
+  ): CardPattern {
+    const patterns = actualFlop.map((flopCard) =>
+      Pokle.getCardPattern(card, flopCard)
+    );
+    if (patterns.includes("🟩")) {
+      return "🟩";
+    }
+    if (patterns.includes("🟨")) {
+      return "🟨";
+    }
+    return "⬜️";
+  }
+
+  public static getFlopPattern(
+    playedFlop: FlopCards,
+    actualFlop: FlopCards
+  ): FlopPattern {
+    const pattern = playedFlop.map((card) =>
+      Pokle.getFlopCardPattern(card, actualFlop)
+    );
+    return pattern as FlopPattern;
+  }
+
+  public static getBoardPattern = (
+    playedBoard: BoardCards,
+    actualBoard: BoardCards
+  ): BoardPattern => {
+    const flopPattern = Pokle.getFlopPattern(
+      playedBoard.slice(0, 3) as FlopCards,
+      actualBoard.slice(0, 3) as FlopCards
+    );
+    const turnPattern = Pokle.getCardPattern(playedBoard[3], actualBoard[3]);
+    const riverPattern = Pokle.getCardPattern(playedBoard[4], actualBoard[4]);
+    return [...flopPattern, turnPattern, riverPattern] as BoardPattern;
+  };
+
+  public static keepOnlyBoardsMatchingPattern({
+    boards,
+    playedBoard,
+    pattern,
+  }: {
+    boards: BoardCards[];
+    playedBoard: BoardCards;
+    pattern: BoardPattern;
+  }) {
+    return boards.filter((board) => {
+      const flopPattern = Pokle.getFlopPattern(
+        playedBoard.slice(0, 3) as FlopCards,
+        board.slice(0, 3) as FlopCards
+      );
+      if (flopPattern.join("") !== pattern.slice(0, 3).join("")) {
+        return false;
+      }
+      const turnOutcome = Pokle.getCardPattern(playedBoard[3], board[3]);
+      if (turnOutcome !== pattern[3]) {
+        return false;
+      }
+      const riverOutcome = Pokle.getCardPattern(playedBoard[4], board[4]);
+      if (riverOutcome !== pattern[4]) {
+        return false;
+      }
+      return true;
+    });
   }
 }

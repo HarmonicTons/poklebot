@@ -1,6 +1,6 @@
 import { Card } from "../poker/Card";
-import { BoardCards } from "../poker/Poker";
-import { Players, Pokle } from "./Pokle";
+import { BoardCards, FlopCards } from "../poker/Poker";
+import { BoardPattern, Players, Pokle } from "./Pokle";
 
 describe("Pokle", () => {
   describe("get all valid cards", () => {
@@ -249,6 +249,205 @@ describe("Pokle", () => {
       ];
 
       expect(pokle.keepOnlyValidBoards({ rivers: boards })).toEqual(boards);
+    });
+  });
+
+  describe("pattern", () => {
+    describe("card pattern", () => {
+      it("should return 🟩", () => {
+        const card1 = new Card("2", "♠");
+        const card2 = new Card("2", "♠");
+        expect(Pokle.getCardPattern(card1, card2)).toBe("🟩");
+      });
+      it("should return 🟨 for same rank", () => {
+        const card1 = new Card("2", "♠");
+        const card2 = new Card("2", "♣");
+        expect(Pokle.getCardPattern(card1, card2)).toBe("🟨");
+      });
+      it("should return 🟨 for same suit", () => {
+        const card1 = new Card("2", "♠");
+        const card2 = new Card("3", "♠");
+        expect(Pokle.getCardPattern(card1, card2)).toBe("🟨");
+      });
+      it("should return ⬜️", () => {
+        const card1 = new Card("2", "♠");
+        const card2 = new Card("3", "♣");
+        expect(Pokle.getCardPattern(card1, card2)).toBe("⬜️");
+      });
+    });
+
+    describe("flop pattern", () => {
+      it("should return 🟩🟩🟩", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟩", "🟩"]);
+      });
+
+      it("should return 🟩🟩🟩 order does not matter", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("2", "♠"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟩", "🟩"]);
+      });
+
+      it("should return 🟨🟨🟨", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+          new Card("7", "♠"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟨", "🟨", "🟨"]);
+      });
+
+      it("should return ⬜️⬜️⬜️", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("5", "♣"),
+          new Card("6", "♣"),
+          new Card("7", "♣"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual([
+          "⬜️",
+          "⬜️",
+          "⬜️",
+        ]);
+      });
+
+      it("should return 🟩🟨⬜️", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♣"),
+          new Card("5", "♣"),
+        ];
+        const flop2: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟨", "⬜️"]);
+      });
+    });
+
+    describe("board pattern", () => {
+      it("should return 🟩🟩🟩🟩🟩", () => {
+        const board1: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+        ];
+        const board2: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+        ];
+        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+          "🟩",
+          "🟩",
+          "🟩",
+          "🟩",
+          "🟩",
+        ]);
+      });
+
+      it("should return 🟩🟨⬜️🟨⬜️", () => {
+        const board1: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♣"),
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+        ];
+        const board2: BoardCards = [
+          new Card("2", "♠"),
+          new Card("5", "♦"),
+          new Card("5", "♥"),
+          new Card("6", "♠"),
+          new Card("7", "♦"),
+        ];
+        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+          "🟩",
+          "🟨",
+          "⬜️",
+          "🟨",
+          "⬜️",
+        ]);
+      });
+    });
+
+    describe("keep only board matching pattern", () => {
+      it("should keep board", () => {
+        const playedBoard: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+        ];
+        const boards: BoardCards[] = [
+          [
+            new Card("2", "♣"),
+            new Card("3", "♣"),
+            new Card("4", "♣"),
+            new Card("5", "♠"),
+            new Card("6", "♠"),
+          ],
+        ];
+        const pattern: BoardPattern = ["🟨", "🟨", "🟨", "🟩", "🟩"];
+        expect(
+          Pokle.keepOnlyBoardsMatchingPattern({ boards, playedBoard, pattern })
+        ).toEqual(boards);
+      });
+
+      it("should remove board", () => {
+        const playedBoard: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♠"),
+        ];
+        const boards: BoardCards[] = [
+          [
+            new Card("2", "♣"),
+            new Card("3", "♣"),
+            new Card("4", "♣"),
+            new Card("5", "♠"),
+            new Card("6", "♠"),
+          ],
+        ];
+        const pattern: BoardPattern = ["⬜️", "🟨", "🟨", "🟩", "🟩"];
+        expect(
+          Pokle.keepOnlyBoardsMatchingPattern({ boards, playedBoard, pattern })
+        ).toEqual([]);
+      });
     });
   });
 });
