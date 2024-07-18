@@ -187,8 +187,8 @@ export class Hand {
     );
   }
 
-  public static orderByRank(hands: Hand[]): Hand[] {
-    return orderBy(hands, "hexRank", "desc");
+  public static orderByScore(hands: Hand[]): Hand[] {
+    return orderBy(hands, "hexScore", "desc");
   }
 
   public static getBestHand(cards: Card[]): Hand {
@@ -204,7 +204,7 @@ export class Hand {
         handsCards.push(hand as HandCards);
       }
       const hands = handsCards.map((handCards) => new Hand(handCards));
-      return Hand.orderByRank(hands)[0];
+      return Hand.orderByScore(hands)[0];
     }
 
     if (cards.length === 7) {
@@ -218,7 +218,7 @@ export class Hand {
         }
       }
       const hands = handsCards.map((handCards) => new Hand(handCards));
-      return Hand.orderByRank(hands)[0];
+      return Hand.orderByScore(hands)[0];
     }
 
     throw new Error("Invalid number of cards");

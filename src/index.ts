@@ -164,7 +164,7 @@ const players4: Players = [
 
 const main = async () => {
   console.log("Start");
-  const { boards, cards } = brutForceSolution(players2);
+  const { boards, cards } = brutForceSolution(players3);
 
   console.log(boards[0]);
 
