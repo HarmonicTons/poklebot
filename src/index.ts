@@ -1,5 +1,6 @@
 import { orderBy, sumBy } from "lodash";
-import { getAllValidFlops, brutForceSolution, Players } from "./brutForce";
+import { brutForceSolution, Players, FlopCards, BoardCards } from "./brutForce";
+import { Card } from "./findHand";
 
 const players: Players = [
   {
@@ -118,78 +119,109 @@ const players3: Players = [
   },
 ];
 
+const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
+type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];
+
+type FlopOutcome = `${SingleOutcome}${SingleOutcome}${SingleOutcome}`;
+
+const getSingleOutcome = (c1: Card, c2: Card) => {
+  if (c1[0] === c2[0] && c1[1] === c2[1]) {
+    return "🟩";
+  }
+  if (c1[0] === c2[0] || c1[1] === c2[1]) {
+    return "🟨";
+  }
+  return "⬜️";
+};
+
+const getFlopSingleOutcome = (card: Card, flop: FlopCards) => {
+  const outcomes = flop.map((flopCard) => getSingleOutcome(card, flopCard));
+  if (outcomes.includes("🟩")) {
+    return "🟩";
+  }
+  if (outcomes.includes("🟨")) {
+    return "🟨";
+  }
+  return "⬜️";
+};
+const getFlopOutcome = (f1: FlopCards, f2: FlopCards): FlopOutcome => {
+  const outcomes = f1.map((card) => getFlopSingleOutcome(card, f2));
+  return outcomes.join("") as FlopOutcome;
+};
+
+const getEntropy = (
+  boards: BoardCards[],
+  getOutcome: (board: BoardCards) => string
+): { entropy: number; outcomesDistribution: Record<string, number> } => {
+  const outcomesDistribution = boards.reduce((_outcomesDistribution, board) => {
+    const outcome = getOutcome(board);
+    if (_outcomesDistribution[outcome] === undefined) {
+      _outcomesDistribution[outcome] = 1;
+    } else {
+      _outcomesDistribution[outcome]++;
+    }
+    return _outcomesDistribution;
+  }, {} as Record<string, number>);
+  const probabilities = Object.values(outcomesDistribution).map(
+    (nbOfOccurences) => nbOfOccurences / boards.length
+  );
+  const entropy = sumBy(probabilities, (p) =>
+    p === 0 ? 0 : -p * Math.log2(p)
+  );
+  return { entropy, outcomesDistribution };
+};
+
 const main = async () => {
   console.log("Start");
-  const { boards, cards } = brutForceSolution(players3);
+  const { boards, cards } = brutForceSolution(players2);
 
   console.log(boards[0]);
 
-  const turnCardsWithEntropy = cards.map((card) => {
-    const outcomes = boards.reduce(
-      (res, board) => {
-        if (board[3][0] === card[0] && board[3][1] === card[1]) {
-          res[0]++;
-          return res;
-        }
-        if (board[3][0] === card[0] || board[3][1] === card[1]) {
-          res[1]++;
-          return res;
-        }
-        res[2]++;
-        return res;
-      },
-      [0, 0, 0]
-    );
-
-    const probabilities = outcomes.map(
-      (nbOfOccurences) => nbOfOccurences / boards.length
-    );
-
-    const entropy = sumBy(probabilities, (p) =>
-      p === 0 ? 0 : p * Math.log2(1 / p)
-    );
-    return { card, entropy };
+  // FLOP
+  const flops: [Card, Card, Card][] = [];
+  for (let i = 0; i < cards.length; i++) {
+    for (let j = i + 1; j < cards.length; j++) {
+      for (let k = j + 1; k < cards.length; k++) {
+        flops.push([cards[i], cards[j], cards[k]]);
+      }
+    }
+  }
+  const flopsWithEntropy = flops.map((flop) => {
+    const getOutcome = (board: BoardCards) => {
+      const boardFlopCards = board.slice(0, 3) as FlopCards;
+      return getFlopOutcome(flop, boardFlopCards);
+    };
+    const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
+    return { flop, entropy, outcomesDistribution };
   });
-  const sortedTurnCardsByEntropy = orderBy(
-    turnCardsWithEntropy,
-    "entropy",
-    "desc"
-  );
-  const bestTurnChoice = sortedTurnCardsByEntropy[0].card;
+  const sortedFlopsByEntropy = orderBy(flopsWithEntropy, "entropy", "desc");
+  const bestFlopChoice = sortedFlopsByEntropy[0];
+  console.log("flop", bestFlopChoice);
+
+  // TURN
+  const turnsWithEntropy = cards.map((card) => {
+    const getOutcome = (board: BoardCards) => {
+      const boardTurnCard = board[3];
+      return getSingleOutcome(card, boardTurnCard);
+    };
+    const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
+    return { card, entropy, outcomesDistribution };
+  });
+  const sortedTurnsByEntropy = orderBy(turnsWithEntropy, "entropy", "desc");
+  const bestTurnChoice = sortedTurnsByEntropy[0];
   console.log("turn", bestTurnChoice);
 
-  const riverCardsWithEntropy = cards.map((card) => {
-    const outcomes = boards.reduce(
-      (res, board) => {
-        if (board[4][0] === card[0] && board[4][1] === card[1]) {
-          res[0]++;
-          return res;
-        }
-        if (board[4][0] === card[0] || board[4][1] === card[1]) {
-          res[1]++;
-          return res;
-        }
-        res[2]++;
-        return res;
-      },
-      [0, 0, 0]
-    );
-
-    const probabilities = outcomes.map(
-      (nbOfOccurences) => nbOfOccurences / boards.length
-    );
-
-    const entropy = sumBy(probabilities, (p) =>
-      p === 0 ? 0 : p * Math.log2(1 / p)
-    );
-    return { card, entropy };
+  // RIVER
+  const riversWithEntropy = cards.map((card) => {
+    const getOutcome = (board: BoardCards) => {
+      const boardRiverCard = board[4];
+      return getSingleOutcome(card, boardRiverCard);
+    };
+    const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
+    return { card, entropy, outcomesDistribution };
   });
-  const sortedRiverCardsByEntropy = orderBy(
-    riverCardsWithEntropy,
-    "entropy",
-    "desc"
-  );
-  const bestRiverChoice = sortedRiverCardsByEntropy[0].card;
+  const sortedRiversByEntropy = orderBy(riversWithEntropy, "entropy", "desc");
+  const bestRiverChoice = sortedRiversByEntropy[0];
   console.log("river", bestRiverChoice);
 };
 
