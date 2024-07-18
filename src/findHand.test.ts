@@ -1,4 +1,4 @@
-import { findHandType, HandCards } from "./findHand";
+import { Card, findHandType, HandCards } from "./findHand";
 
 describe("find hand", () => {
   it("SF", () => {
@@ -217,5 +217,19 @@ describe("get score", () => {
     ];
 
     expect(findHandType(handCards).handScore).toBe("0b9763");
+  });
+
+  it("7 cards", () => {
+    const handCards: Card[] = [
+      ["3", "♠"],
+      ["8", "♠"],
+      ["9", "♠"],
+      ["c", "♠"],
+      ["6", "♠"],
+      ["c", "♥"],
+      ["8", "♦"],
+    ];
+
+    expect(findHandType(handCards).handScore).toBe("5c9863");
   });
 });

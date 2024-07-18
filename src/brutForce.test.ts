@@ -1,4 +1,5 @@
 import {
+  areScoreValids,
   BoardCards,
   filterOutBoardsContainingKickers,
   Players,
@@ -56,5 +57,13 @@ describe("brut force", () => {
     ];
 
     expect(filterOutBoardsContainingKickers(players, boards)).toEqual([]);
+  });
+});
+
+describe("are score valid", () => {
+  it("score today", () => {
+    expect(areScoreValids([2, 1, 2], ["5c9863", "5c9863", "5c9863"])).toBe(
+      false
+    );
   });
 });

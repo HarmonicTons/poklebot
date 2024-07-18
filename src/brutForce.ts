@@ -73,11 +73,11 @@ export const areScoreValids = (
   playersScores: [string, string, string]
 ): boolean => {
   if (playersPositions[0] > playersPositions[1]) {
-    if (playersScores[0] > playersScores[1]) {
+    if (playersScores[0] >= playersScores[1]) {
       return false;
     }
   } else if (playersPositions[0] < playersPositions[1]) {
-    if (playersScores[0] < playersScores[1]) {
+    if (playersScores[0] <= playersScores[1]) {
       return false;
     }
   } else {
@@ -91,7 +91,7 @@ export const areScoreValids = (
       return false;
     }
   } else if (playersPositions[0] < playersPositions[2]) {
-    if (playersScores[0] < playersScores[2]) {
+    if (playersScores[0] <= playersScores[2]) {
       return false;
     }
   } else {
@@ -101,11 +101,11 @@ export const areScoreValids = (
   }
 
   if (playersPositions[2] > playersPositions[1]) {
-    if (playersScores[2] > playersScores[1]) {
+    if (playersScores[2] >= playersScores[1]) {
       return false;
     }
   } else if (playersPositions[2] < playersPositions[1]) {
-    if (playersScores[2] < playersScores[1]) {
+    if (playersScores[2] <= playersScores[1]) {
       return false;
     }
   } else {

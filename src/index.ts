@@ -79,9 +79,50 @@ const players2: Players = [
   },
 ];
 
+const players3: Players = [
+  {
+    name: "Cat",
+    positions: {
+      flop: 3,
+      turn: 3,
+      river: 2,
+    },
+    cards: [
+      ["6", "♦"],
+      ["3", "♣"],
+    ],
+  },
+  {
+    name: "Pat",
+    positions: {
+      flop: 2,
+      turn: 1,
+      river: 1,
+    },
+    cards: [
+      ["c", "♥"],
+      ["8", "♦"],
+    ],
+  },
+  {
+    name: "Nat",
+    positions: {
+      flop: 1,
+      turn: 2,
+      river: 2,
+    },
+    cards: [
+      ["7", "♣"],
+      ["9", "♥"],
+    ],
+  },
+];
+
 const main = async () => {
   console.log("Start");
-  const { boards, cards } = brutForceSolution(players);
+  const { boards, cards } = brutForceSolution(players3);
+
+  console.log(boards[0]);
 
   const turnCardsWithEntropy = cards.map((card) => {
     const outcomes = boards.reduce(
