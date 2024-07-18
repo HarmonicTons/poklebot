@@ -73,46 +73,46 @@ export const getValidCards = (players: Players): CardType[] => {
 
 export const areScoreValids = (
   playersPositions: [PlayerPosition, PlayerPosition, PlayerPosition],
-  playersScores: [string, string, string]
+  playersHands: [Hand, Hand, Hand]
 ): boolean => {
   if (playersPositions[0] > playersPositions[1]) {
-    if (playersScores[0] >= playersScores[1]) {
+    if (playersHands[0].isWorseThan(playersHands[1]) === false) {
       return false;
     }
-  } else if (playersPositions[0] < playersPositions[1]) {
-    if (playersScores[0] <= playersScores[1]) {
+  } else if (playersPositions[1] > playersPositions[0]) {
+    if (playersHands[1].isWorseThan(playersHands[0]) === false) {
       return false;
     }
   } else {
-    if (playersScores[0] !== playersScores[1]) {
+    if (playersHands[0].isAsGoodAs(playersHands[1]) === false) {
       return false;
     }
   }
 
   if (playersPositions[0] > playersPositions[2]) {
-    if (playersScores[0] > playersScores[2]) {
+    if (playersHands[0].isWorseThan(playersHands[2]) === false) {
       return false;
     }
-  } else if (playersPositions[0] < playersPositions[2]) {
-    if (playersScores[0] <= playersScores[2]) {
+  } else if (playersPositions[2] > playersPositions[0]) {
+    if (playersHands[2].isWorseThan(playersHands[0]) === false) {
       return false;
     }
   } else {
-    if (playersScores[0] !== playersScores[2]) {
+    if (playersHands[0].isAsGoodAs(playersHands[2]) === false) {
       return false;
     }
   }
 
-  if (playersPositions[2] > playersPositions[1]) {
-    if (playersScores[2] >= playersScores[1]) {
+  if (playersPositions[1] > playersPositions[2]) {
+    if (playersHands[1].isWorseThan(playersHands[2]) === false) {
       return false;
     }
-  } else if (playersPositions[2] < playersPositions[1]) {
-    if (playersScores[2] <= playersScores[1]) {
+  } else if (playersPositions[2] > playersPositions[1]) {
+    if (playersHands[2].isWorseThan(playersHands[1]) === false) {
       return false;
     }
   } else {
-    if (playersScores[2] !== playersScores[1]) {
+    if (playersHands[1].isAsGoodAs(playersHands[2]) === false) {
       return false;
     }
   }
@@ -123,15 +123,15 @@ export const isFlopValid = (
   flopCards: FlopCards,
   players: Players
 ): boolean => {
-  const p1Score = Hand.getBestHand(
+  const p1Hand = Hand.getBestHand(
     [...players[0].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-  ).hexScore;
-  const p2Score = Hand.getBestHand(
+  );
+  const p2Hand = Hand.getBestHand(
     [...players[1].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-  ).hexScore;
-  const p3Score = Hand.getBestHand(
+  );
+  const p3Hand = Hand.getBestHand(
     [...players[2].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-  ).hexScore;
+  );
 
   return areScoreValids(
     [
@@ -139,7 +139,7 @@ export const isFlopValid = (
       players[1].positions.flop,
       players[2].positions.flop,
     ],
-    [p1Score, p2Score, p3Score]
+    [p1Hand, p2Hand, p3Hand]
   );
 };
 
@@ -158,15 +158,15 @@ export const getAllValidFlops = (
         const c3 = validCards[ci3];
         const flopCards: FlopCards = [c1, c2, c3];
 
-        const p1Score = Hand.getBestHand(
+        const p1Hand = Hand.getBestHand(
           [...players[0].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-        ).hexScore;
-        const p2Score = Hand.getBestHand(
+        );
+        const p2Hand = Hand.getBestHand(
           [...players[1].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-        ).hexScore;
-        const p3Score = Hand.getBestHand(
+        );
+        const p3Hand = Hand.getBestHand(
           [...players[2].cards, ...flopCards].map((c) => Card.fromHexArray(c))
-        ).hexScore;
+        );
 
         n++;
         if (
@@ -176,7 +176,7 @@ export const getAllValidFlops = (
               players[1].positions.flop,
               players[2].positions.flop,
             ],
-            [p1Score, p2Score, p3Score]
+            [p1Hand, p2Hand, p3Hand]
           ) === true
         ) {
           flops.push(flopCards);
@@ -212,17 +212,11 @@ export const getAllValidTurns = (
       const turnCards: TurnCards = [...flop, c1];
 
       const p1Cards = [...players[0].cards, ...turnCards];
-      const p1Score = Hand.getBestHand(
-        p1Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p1Hand = Hand.getBestHand(p1Cards.map((c) => Card.fromHexArray(c)));
       const p2Cards = [...players[1].cards, ...turnCards];
-      const p2Score = Hand.getBestHand(
-        p2Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p2Hand = Hand.getBestHand(p2Cards.map((c) => Card.fromHexArray(c)));
       const p3Cards = [...players[2].cards, ...turnCards];
-      const p3Score = Hand.getBestHand(
-        p3Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p3Hand = Hand.getBestHand(p3Cards.map((c) => Card.fromHexArray(c)));
 
       n++;
       if (
@@ -232,7 +226,7 @@ export const getAllValidTurns = (
             players[1].positions.turn,
             players[2].positions.turn,
           ],
-          [p1Score, p2Score, p3Score]
+          [p1Hand, p2Hand, p3Hand]
         ) === true
       ) {
         turns.push(turnCards);
@@ -266,17 +260,11 @@ export const getAllValidRivers = (
       const riverCards: BoardCards = [...turn, c1];
 
       const p1Cards = [...players[0].cards, ...riverCards];
-      const p1Score = Hand.getBestHand(
-        p1Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p1Hand = Hand.getBestHand(p1Cards.map((c) => Card.fromHexArray(c)));
       const p2Cards = [...players[1].cards, ...riverCards];
-      const p2Score = Hand.getBestHand(
-        p2Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p2Hand = Hand.getBestHand(p2Cards.map((c) => Card.fromHexArray(c)));
       const p3Cards = [...players[2].cards, ...riverCards];
-      const p3Score = Hand.getBestHand(
-        p3Cards.map((c) => Card.fromHexArray(c))
-      ).hexScore;
+      const p3Hand = Hand.getBestHand(p3Cards.map((c) => Card.fromHexArray(c)));
 
       n++;
       if (
@@ -286,7 +274,7 @@ export const getAllValidRivers = (
             players[1].positions.river,
             players[2].positions.river,
           ],
-          [p1Score, p2Score, p3Score]
+          [p1Hand, p2Hand, p3Hand]
         ) === true
       ) {
         rivers.push(riverCards);

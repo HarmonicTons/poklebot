@@ -223,4 +223,16 @@ export class Hand {
 
     throw new Error("Invalid number of cards");
   }
+
+  public isAsGoodAs(hand: Hand): boolean {
+    return this.hexScore === hand.hexScore;
+  }
+
+  public isBetterThan(hand: Hand): boolean {
+    return this.hexScore > hand.hexScore;
+  }
+
+  public isWorseThan(hand: Hand): boolean {
+    return this.hexScore < hand.hexScore;
+  }
 }
