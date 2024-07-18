@@ -1,8 +1,8 @@
 import { orderBy, sumBy } from "lodash";
 import { BoardCards, FlopCards } from "./brutForce";
-import { Card, CardSuit, HexCardRank } from "./poker/Card";
+import { Card, CardHexArray, CardSuit, HexCardRank } from "./poker/Card";
 
-type CardType = [HexCardRank, CardSuit];
+type CardType = CardHexArray;
 
 export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];

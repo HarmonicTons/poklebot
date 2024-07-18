@@ -1,6 +1,7 @@
 import {
   Card,
   CARD_SUITS,
+  CardHexArray,
   CardRank,
   CardString,
   CardSuit,
@@ -9,7 +10,7 @@ import {
 } from "./poker/Card";
 import { Hand } from "./poker/Hand";
 
-type CardType = [HexCardRank, CardSuit];
+type CardType = CardHexArray;
 
 export type PlayerCards = [CardType, CardType];
 export type PlayersCards = [PlayerCards, PlayerCards, PlayerCards];
@@ -338,8 +339,8 @@ export const filterOutBoardsContainingKickers = (
           hand.primaryCards.forEach((primaryCard) => {
             boardCards.forEach((boardCard) => {
               if (
-                boardCard.card[0] === primaryCard.rank ||
-                boardCard.card[0] === primaryCard.rank
+                boardCard.card[0] === primaryCard.hexRank ||
+                boardCard.card[0] === primaryCard.hexRank
               ) {
                 boardCard.isKicker = false;
               }

@@ -69,6 +69,8 @@ export type CardSuit = (typeof CARD_SUITS)[number];
 
 export type CardString = `${CardRank}${CardSuit}`;
 
+export type CardHexArray = [HexCardRank, CardSuit];
+
 export class Card {
   constructor(public rank: CardRank, public suit: CardSuit) {}
 
@@ -92,7 +94,7 @@ export class Card {
     return new Card(str[0] as CardRank, str[1] as CardSuit);
   }
 
-  public static fromHexArray([rank, suit]: [HexCardRank, CardSuit]): Card {
+  public static fromHexArray([rank, suit]: CardHexArray): Card {
     return new Card(cardRankRecord[rank], suit);
   }
 }

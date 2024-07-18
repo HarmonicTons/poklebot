@@ -1,8 +1,8 @@
 import { BoardCards } from "./brutForce";
 import { getFlopRecommendation } from "./entropy";
-import { CardSuit, HexCardRank } from "./poker/Card";
+import { CardHexArray, CardSuit, HexCardRank } from "./poker/Card";
 
-type CardType = [HexCardRank, CardSuit];
+type CardType = CardHexArray;
 
 describe("entropy", () => {
   it("2 remainings boards", () => {
