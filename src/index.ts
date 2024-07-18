@@ -3,6 +3,7 @@ import {
   ActualOutcome,
   filterBoards,
   getFlopRecommendation,
+  getHardModeRecommendation,
   getRecommendation,
   getRiverRecommendation,
   getTurnRecommendation,
@@ -124,12 +125,44 @@ const players3: Players = [
     ],
   },
 ];
-const actualSolution3: BoardCards = [
-  ["7", "♦"],
-  ["7", "♠"],
-  ["c", "♠"],
-  ["c", "♦"],
-  ["c", "♣"],
+
+const players4: Players = [
+  {
+    name: "Jaz",
+    positions: {
+      flop: 3,
+      turn: 2,
+      river: 3,
+    },
+    cards: [
+      ["b", "♦"],
+      ["9", "♥"],
+    ],
+  },
+  {
+    name: "Baz",
+    positions: {
+      flop: 1,
+      turn: 1,
+      river: 2,
+    },
+    cards: [
+      ["6", "♦"],
+      ["7", "♥"],
+    ],
+  },
+  {
+    name: "Raz",
+    positions: {
+      flop: 2,
+      turn: 3,
+      river: 1,
+    },
+    cards: [
+      ["a", "♠"],
+      ["d", "♠"],
+    ],
+  },
 ];
 
 const main = async () => {
@@ -138,24 +171,65 @@ const main = async () => {
 
   console.log(boards[0]);
 
+  const hardModeRecommendation = getHardModeRecommendation(boards);
+  console.log("hard-mode recommendation", hardModeRecommendation);
+
   const recommendation = getRecommendation(boards, cards);
-  console.log("recommendation", recommendation);
+  console.log(
+    "recommendation",
+    recommendation.flop,
+    recommendation.turn,
+    recommendation.river
+  );
 
   const boardPlayed: BoardCards = [
-    ["2", "♥"],
-    ["8", "♥"],
+    ["7", "♦"],
     ["9", "♣"],
+    ["b", "♥"],
     ["a", "♠"],
-    ["8", "♠"],
+    ["8", "♥"],
   ];
-  const actualOutcome: ActualOutcome = ["⬜️", "⬜️", "⬜️", "⬜️", "⬜️"];
+  const actualOutcome: ActualOutcome = ["🟩", "⬜️", "⬜️", "⬜️", "⬜️"];
 
   const filteredBoards = filterBoards(boards, boardPlayed, actualOutcome);
 
   console.log(filteredBoards.length);
 
+  const hardModeRecommendation2 = getHardModeRecommendation(filteredBoards);
+  console.log("hard-mode recommendation", hardModeRecommendation2);
+
   const recommendation2 = getRecommendation(filteredBoards, cards);
-  console.log("recommendation", recommendation2);
+  console.log(
+    "recommendation",
+    recommendation2.flop,
+    recommendation2.turn,
+    recommendation2.river
+  );
+
+  // const boardPlayed2: BoardCards = [
+  //   ["2", "♠"],
+  //   ["7", "♠"],
+  //   ["c", "♣"],
+  //   ["9", "♣"],
+  //   ["b", "♠"],
+  // ];
+  // const actualOutcome2: ActualOutcome = ["🟨", "🟨", "🟨", "🟨", "🟩"];
+
+  // const filteredBoards2 = filterBoards(
+  //   filteredBoards,
+  //   boardPlayed2,
+  //   actualOutcome2
+  // );
+
+  // console.log(filteredBoards2.length);
+
+  // const recommendation3 = getRecommendation(filteredBoards2, cards);
+  // console.log(
+  //   "recommendation",
+  //   recommendation3.flop,
+  //   recommendation3.turn,
+  //   recommendation3.river
+  // );
 };
 
 main()

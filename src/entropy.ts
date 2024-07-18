@@ -7,6 +7,13 @@ export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];
 
 export type FlopOutcome = [SingleOutcome, SingleOutcome, SingleOutcome];
+export type BoardOutcome = [
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome
+];
 
 export const getSingleOutcome = (c1: Card, c2: Card) => {
   if (c1[0] === c2[0] && c1[1] === c2[1]) {
@@ -32,6 +39,18 @@ export const getFlopOutcome = (f1: FlopCards, f2: FlopCards): FlopOutcome => {
   const outcomes = f1.map((card) => getFlopSingleOutcome(card, f2));
   return outcomes as FlopOutcome;
 };
+export const getBoardOutcome = (
+  b1: BoardCards,
+  b2: BoardCards
+): BoardOutcome => {
+  const flopOutcome = getFlopOutcome(
+    b1.slice(0, 3) as FlopCards,
+    b2.slice(0, 3) as FlopCards
+  );
+  const turnOutcome = getSingleOutcome(b1[3], b2[3]);
+  const riverOutcome = getSingleOutcome(b1[4], b2[4]);
+  return [...flopOutcome, turnOutcome, riverOutcome] as BoardOutcome;
+};
 
 export const getEntropy = (
   boards: BoardCards[],
@@ -53,6 +72,26 @@ export const getEntropy = (
     p === 0 ? 0 : -p * Math.log2(p)
   );
   return { entropy, outcomesDistribution };
+};
+
+export const getBoardWithEntropy = (boards: BoardCards[]) => {
+  const boardsWithEntropy = boards.map((board) => {
+    const getOutcome = (board2: BoardCards) => {
+      return getBoardOutcome(board, board2).join("");
+    };
+    const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
+    const probabilityOfBeingAnswer =
+      (outcomesDistribution["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
+    const recommendationIndex = entropy + probabilityOfBeingAnswer;
+    return {
+      board,
+      entropy,
+      outcomesDistribution,
+      probabilityOfBeingAnswer,
+      recommendationIndex,
+    };
+  });
+  return orderBy(boardsWithEntropy, "recommendationIndex", "desc");
 };
 
 export const getFlopsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
@@ -152,6 +191,11 @@ export const boardIsValid = (board: BoardCards): boolean => {
     }
   }
   return true;
+};
+
+export const getHardModeRecommendation = (boards: BoardCards[]) => {
+  const boardsWithEntropy = getBoardWithEntropy(boards);
+  return boardsWithEntropy[0];
 };
 
 export const getRecommendation = (boards: BoardCards[], cards: Card[]) => {
