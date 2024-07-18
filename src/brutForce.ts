@@ -1,6 +1,15 @@
-import { findHandType } from "./findHand";
-import { CardType, CARD_SUITS, HEX_CARD_RANK } from "./poker/Card";
-import { getHexHandRank } from "./poker/Hand";
+import {
+  Card,
+  CARD_SUITS,
+  CardRank,
+  CardString,
+  CardSuit,
+  HEX_CARD_RANK,
+  HexCardRank,
+} from "./poker/Card";
+import { Hand } from "./poker/Hand";
+
+type CardType = [HexCardRank, CardSuit];
 
 export type PlayerCards = [CardType, CardType];
 export type PlayersCards = [PlayerCards, PlayerCards, PlayerCards];
@@ -124,18 +133,21 @@ export const getAllValidFlops = (
         const c3 = validCards[ci3];
         const flopCards: FlopCards = [c1, c2, c3];
 
-        const p1Score = findHandType([
-          ...players[0].cards,
-          ...flopCards,
-        ]).handScore;
-        const p2Score = findHandType([
-          ...players[1].cards,
-          ...flopCards,
-        ]).handScore;
-        const p3Score = findHandType([
-          ...players[2].cards,
-          ...flopCards,
-        ]).handScore;
+        const p1Score = Hand.getBestHand(
+          [...players[0].cards, ...flopCards].map((c) =>
+            Card.fromString(c.join("") as CardString)
+          )
+        ).hexScore;
+        const p2Score = Hand.getBestHand(
+          [...players[1].cards, ...flopCards].map((c) =>
+            Card.fromString(c.join("") as CardString)
+          )
+        ).hexScore;
+        const p3Score = Hand.getBestHand(
+          [...players[2].cards, ...flopCards].map((c) =>
+            Card.fromString(c.join("") as CardString)
+          )
+        ).hexScore;
 
         n++;
         if (
@@ -181,11 +193,17 @@ export const getAllValidTurns = (
       const turnCards: TurnCards = [...flop, c1];
 
       const p1Cards = [...players[0].cards, ...turnCards];
-      const p1Score = findHandType(p1Cards).handScore;
+      const p1Score = Hand.getBestHand(
+        p1Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
       const p2Cards = [...players[1].cards, ...turnCards];
-      const p2Score = findHandType(p2Cards).handScore;
+      const p2Score = Hand.getBestHand(
+        p2Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
       const p3Cards = [...players[2].cards, ...turnCards];
-      const p3Score = findHandType(p3Cards).handScore;
+      const p3Score = Hand.getBestHand(
+        p3Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
 
       n++;
       if (
@@ -229,11 +247,17 @@ export const getAllValidRivers = (
       const riverCards: BoardCards = [...turn, c1];
 
       const p1Cards = [...players[0].cards, ...riverCards];
-      const p1Score = findHandType(p1Cards).handScore;
+      const p1Score = Hand.getBestHand(
+        p1Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
       const p2Cards = [...players[1].cards, ...riverCards];
-      const p2Score = findHandType(p2Cards).handScore;
+      const p2Score = Hand.getBestHand(
+        p2Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
       const p3Cards = [...players[2].cards, ...riverCards];
-      const p3Score = findHandType(p3Cards).handScore;
+      const p3Score = Hand.getBestHand(
+        p3Cards.map((c) => Card.fromString(c.join("") as any))
+      ).hexScore;
 
       n++;
       if (
@@ -288,18 +312,16 @@ export const filterOutBoardsContainingKickers = (
       });
       for (const cards of [flopCards, turnCards, riverCards]) {
         const allCards = [...cards, ...player.cards];
-        const { handType, scoringCards: playerScoringCards } =
-          findHandType(allCards);
+        const hand = Hand.getBestHand(
+          allCards.map((c) => Card.fromString(c.join("") as any))
+        );
 
-        if (
-          handType === getHexHandRank("ST") ||
-          handType === getHexHandRank("SF")
-        ) {
-          playerScoringCards.forEach((scoringCard) => {
+        if (hand.rank === "ST" || hand.rank === "SF") {
+          hand.primaryCards.forEach((primaryCard) => {
             boardCards.forEach((boardCard) => {
               if (
-                boardCard.card[0] === scoringCard[0] ||
-                boardCard.card[0] === scoringCard[0]
+                boardCard.card[0] === primaryCard.rank ||
+                boardCard.card[0] === primaryCard.rank
               ) {
                 boardCard.isKicker = false;
               }

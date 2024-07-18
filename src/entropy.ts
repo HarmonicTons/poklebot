@@ -1,6 +1,8 @@
 import { orderBy, sumBy } from "lodash";
 import { BoardCards, FlopCards } from "./brutForce";
-import { CardType, cardsAreEqual } from "./poker/Card";
+import { Card, CardSuit, HexCardRank } from "./poker/Card";
+
+type CardType = [HexCardRank, CardSuit];
 
 export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];
@@ -202,7 +204,9 @@ export const getRiverRecommendation = (
 export const boardIsValid = (board: BoardCards): boolean => {
   for (let i = 0; i < board.length; i++) {
     for (let j = i + 1; j < board.length; j++) {
-      if (cardsAreEqual(board[i], board[j])) {
+      const c1 = Card.fromString(board[i].join("") as any);
+      const c2 = Card.fromString(board[j].join("") as any);
+      if (c1.isEqual(c2)) {
         return false;
       }
     }

@@ -1,3 +1,5 @@
+import { orderBy } from "lodash";
+
 export const CARD_RANKS = [
   "2",
   "3",
@@ -46,27 +48,32 @@ export const hexCardRankRecord: Record<CardRank, HexCardRank> = {
   K: "d",
   A: "e",
 };
-export const getHexCardRank = (cardRank: CardRank): HexCardRank => {
-  return hexCardRankRecord[cardRank];
-};
 
 export const CARD_SUITS = ["♠", "♣", "♥", "♦"] as const;
-export type CardSuite = (typeof CARD_SUITS)[number];
+export type CardSuit = (typeof CARD_SUITS)[number];
 
-export type CardType = [HexCardRank, CardSuite];
-
-export const cardsAreEqual = (card1: CardType, card2: CardType) => {
-  return card1[0] === card2[0] && card1[1] === card2[1];
-};
+export type CardString = `${CardRank}${CardSuit}`;
 
 export class Card {
-  constructor(public rank: HexCardRank, public suit: CardSuite) {}
+  constructor(public rank: CardRank, public suit: CardSuit) {}
 
-  public toString() {
+  public toString(): CardString {
     return `${this.rank}${this.suit}`;
   }
 
   public isEqual(card: Card) {
     return this.rank === card.rank && this.suit === card.suit;
+  }
+
+  public get hexRank(): HexCardRank {
+    return hexCardRankRecord[this.rank];
+  }
+
+  public static orderByRank(cards: Card[]): Card[] {
+    return orderBy(cards, "hexRank", "desc");
+  }
+
+  public static fromString(str: CardString): Card {
+    return new Card(str[0] as CardRank, str[1] as CardSuit);
   }
 }
