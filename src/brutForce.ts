@@ -1,12 +1,8 @@
-import {
-  Card,
-  CARD_COLORS,
-  ENCODED_CARD_VALUES,
-  findHandType,
-  getEncodedHandType,
-} from "./findHand";
+import { findHandType } from "./findHand";
+import { CardType, CARD_SUITS, HEX_CARD_RANK } from "./poker/Card";
+import { getHexHandRank } from "./poker/Hand";
 
-export type PlayerCards = [Card, Card];
+export type PlayerCards = [CardType, CardType];
 export type PlayersCards = [PlayerCards, PlayerCards, PlayerCards];
 export type PlayerPosition = 1 | 2 | 3;
 export type PlayersPositions = [PlayerPosition, PlayerPosition, PlayerPosition];
@@ -22,11 +18,11 @@ export type Player = {
 };
 export type Players = [Player, Player, Player];
 
-export type FlopCards = [Card, Card, Card];
+export type FlopCards = [CardType, CardType, CardType];
 
 export const brutForceSolution = (
   players: Players
-): { boards: BoardCards[]; cards: Card[] } => {
+): { boards: BoardCards[]; cards: CardType[] } => {
   const validCards = getValidCards(players);
 
   const flops = getAllValidFlops(players, validCards);
@@ -40,7 +36,7 @@ export const brutForceSolution = (
   return { boards: validBoards, cards: validCards };
 };
 
-export const getValidCards = (players: Players): Card[] => {
+export const getValidCards = (players: Players): CardType[] => {
   // TODO remove obvious kickers (cannot be part of any straight)
   const usedCards: Record<string, boolean> = {};
   players.forEach((player) => {
@@ -49,12 +45,12 @@ export const getValidCards = (players: Players): Card[] => {
     });
   });
 
-  const validCards: Card[] = [];
+  const validCards: CardType[] = [];
 
-  for (let i = 0; i < ENCODED_CARD_VALUES.length; i++) {
-    const v1 = ENCODED_CARD_VALUES[i];
-    for (let j = 0; j < CARD_COLORS.length; j++) {
-      const c1 = CARD_COLORS[j];
+  for (let i = 0; i < HEX_CARD_RANK.length; i++) {
+    const v1 = HEX_CARD_RANK[i];
+    for (let j = 0; j < CARD_SUITS.length; j++) {
+      const c1 = CARD_SUITS[j];
       if (usedCards[`${v1}${c1}`]) {
         continue;
       }
@@ -115,7 +111,7 @@ export const areScoreValids = (
 
 export const getAllValidFlops = (
   players: Players,
-  validCards: Card[]
+  validCards: CardType[]
 ): FlopCards[] => {
   let n = 0;
   let flops: FlopCards[] = [];
@@ -163,11 +159,11 @@ export const getAllValidFlops = (
   return flops;
 };
 
-export type TurnCards = [Card, Card, Card, Card];
+export type TurnCards = [CardType, CardType, CardType, CardType];
 
 export const getAllValidTurns = (
   players: Players,
-  validCards: Card[],
+  validCards: CardType[],
   flops: FlopCards[]
 ): TurnCards[] => {
   let n = 0;
@@ -212,11 +208,11 @@ export const getAllValidTurns = (
   return turns;
 };
 
-export type BoardCards = [Card, Card, Card, Card, Card];
+export type BoardCards = [CardType, CardType, CardType, CardType, CardType];
 
 export const getAllValidRivers = (
   players: Players,
-  validCards: Card[],
+  validCards: CardType[],
   turns: TurnCards[]
 ): BoardCards[] => {
   let n = 0;
@@ -296,8 +292,8 @@ export const filterOutBoardsContainingKickers = (
           findHandType(allCards);
 
         if (
-          handType === getEncodedHandType("ST") ||
-          handType === getEncodedHandType("SF")
+          handType === getHexHandRank("ST") ||
+          handType === getHexHandRank("SF")
         ) {
           playerScoringCards.forEach((scoringCard) => {
             boardCards.forEach((boardCard) => {

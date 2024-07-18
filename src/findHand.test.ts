@@ -1,4 +1,6 @@
-import { Card, findHandType, HandCards } from "./findHand";
+import { findHandType } from "./findHand";
+import { CardType } from "./poker/Card";
+import { HandCards } from "./poker/Hand";
 
 describe("find hand", () => {
   it("SF", () => {
@@ -220,7 +222,7 @@ describe("get score", () => {
   });
 
   it("7 cards", () => {
-    const handCards: Card[] = [
+    const handCards: CardType[] = [
       ["3", "♠"],
       ["8", "♠"],
       ["9", "♠"],
@@ -234,7 +236,7 @@ describe("get score", () => {
   });
 
   it("too many pairs", () => {
-    const handCards: Card[] = [
+    const handCards: CardType[] = [
       ["7", "♦"],
       ["7", "♠"],
       ["c", "♠"],
@@ -248,7 +250,7 @@ describe("get score", () => {
   });
 
   it("6 cards", () => {
-    const handCards: Card[] = [
+    const handCards: CardType[] = [
       ["7", "♦"],
       ["7", "♠"],
       ["c", "♠"],

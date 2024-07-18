@@ -1,10 +1,10 @@
 import { BoardCards } from "./brutForce";
 import { getFlopRecommendation } from "./entropy";
-import { Card } from "./findHand";
+import { CardType } from "./poker/Card";
 
 describe("entropy", () => {
   it("2 remainings boards", () => {
-    const cards: Card[] = [
+    const cards: CardType[] = [
       ["2", "♠"],
       ["2", "♣"],
       ["2", "♥"],

@@ -1,6 +1,6 @@
 import { orderBy, sumBy } from "lodash";
 import { BoardCards, FlopCards } from "./brutForce";
-import { Card, cardsAreEqual } from "./findHand";
+import { CardType, cardsAreEqual } from "./poker/Card";
 
 export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];
@@ -14,7 +14,7 @@ export type BoardOutcome = [
   SingleOutcome
 ];
 
-export const getSingleOutcome = (c1: Card, c2: Card) => {
+export const getSingleOutcome = (c1: CardType, c2: CardType) => {
   if (c1[0] === c2[0] && c1[1] === c2[1]) {
     return "🟩";
   }
@@ -24,7 +24,7 @@ export const getSingleOutcome = (c1: Card, c2: Card) => {
   return "⬜️";
 };
 
-export const getFlopSingleOutcome = (card: Card, flop: FlopCards) => {
+export const getFlopSingleOutcome = (card: CardType, flop: FlopCards) => {
   const outcomes = flop.map((flopCard) => getSingleOutcome(card, flopCard));
   if (outcomes.includes("🟩")) {
     return "🟩";
@@ -93,8 +93,11 @@ export const getBoardWithEntropy = (boards: BoardCards[]) => {
   return orderBy(boardsWithEntropy, "recommendationIndex", "desc");
 };
 
-export const getFlopsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
-  const flops: [Card, Card, Card][] = [];
+export const getFlopsWithEntropy = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
+  const flops: [CardType, CardType, CardType][] = [];
   for (let i = 0; i < cards.length; i++) {
     for (let j = i + 1; j < cards.length; j++) {
       for (let k = j + 1; k < cards.length; k++) {
@@ -124,12 +127,18 @@ export const getFlopsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
   return orderBy(flopsWithEntropy, "recommendationIndex", "desc");
 };
 
-export const getFlopRecommendation = (boards: BoardCards[], cards: Card[]) => {
+export const getFlopRecommendation = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
   const flopsWithEntropy = getFlopsWithEntropy(boards, cards);
   return flopsWithEntropy[0];
 };
 
-export const getTurnsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
+export const getTurnsWithEntropy = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
   const turnsWithEntropy = cards.map((card) => {
     const getOutcome = (board: BoardCards) => {
       const boardTurnCard = board[3];
@@ -150,12 +159,18 @@ export const getTurnsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
   return orderBy(turnsWithEntropy, "recommendationIndex", "desc");
 };
 
-export const getTurnRecommendation = (boards: BoardCards[], cards: Card[]) => {
+export const getTurnRecommendation = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
   const turnsWithEntropy = getTurnsWithEntropy(boards, cards);
   return turnsWithEntropy[0];
 };
 
-export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
+export const getRiversWithEntropy = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
   const riversWithEntropy = cards.map((card) => {
     const getOutcome = (board: BoardCards) => {
       const boardRiverCard = board[4];
@@ -176,7 +191,10 @@ export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
   return orderBy(riversWithEntropy, "recommendationIndex", "desc");
 };
 
-export const getRiverRecommendation = (boards: BoardCards[], cards: Card[]) => {
+export const getRiverRecommendation = (
+  boards: BoardCards[],
+  cards: CardType[]
+) => {
   const riversWithEntropy = getRiversWithEntropy(boards, cards);
   return riversWithEntropy[0];
 };
@@ -197,7 +215,7 @@ export const getHardModeRecommendation = (boards: BoardCards[]) => {
   return boardsWithEntropy[0];
 };
 
-export const getRecommendation = (boards: BoardCards[], cards: Card[]) => {
+export const getRecommendation = (boards: BoardCards[], cards: CardType[]) => {
   const flopsWithEntropy = getFlopsWithEntropy(boards, cards).slice(0, 10);
   const turnsWithEntropy = getTurnsWithEntropy(boards, cards).slice(0, 10);
   const riversWithEntropy = getRiversWithEntropy(boards, cards).slice(0, 10);
