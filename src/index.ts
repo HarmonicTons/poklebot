@@ -1,14 +1,9 @@
-import {
-  ActualOutcome,
-  filterBoards,
-  getHardModeRecommendation,
-  getRecommendation,
-  OldBoardCards,
-} from "./entropy";
+import { getHardModeRecommendation, getRecommendation } from "./entropy";
 import { Card } from "./poker/Card";
-import { Pokle, Players } from "./pokle/Pokle";
+import { BoardCards } from "./poker/Poker";
+import { Pokle, Players, BoardPattern } from "./pokle/Pokle";
 
-const players2: Players = [
+const players: Players = [
   {
     name: "Bex",
     positions: {
@@ -37,79 +32,61 @@ const players2: Players = [
     cards: [new Card("Q", "♣"), new Card("9", "♠")],
   },
 ];
-const pokle2 = new Pokle(players2);
+const pokle = new Pokle(players);
 
 const main = async () => {
-  console.log("Start");
-  const newCards = pokle2.validCards;
-  const newBoards = pokle2.solve();
+  console.log("PokleBot");
+  const cards = pokle.validCards;
+  const boards = pokle.solve();
 
-  const cards = newCards.map((c) => c.toHexArray());
-  const boards = newBoards.map((b) =>
-    b.map((c) => c.toHexArray())
-  ) as OldBoardCards[];
-
-  console.log("boards", newBoards.length);
-  console.log(boards[0]);
+  console.log("Possible boards:", boards.length);
 
   const hardModeRecommendation = getHardModeRecommendation(boards);
-  console.log("hard-mode recommendation", hardModeRecommendation);
+  console.log(
+    "hard-mode recommendation:",
+    JSON.stringify(hardModeRecommendation.board),
+    "- E:",
+    hardModeRecommendation.entropy.toFixed(4),
+    " P:",
+    hardModeRecommendation.probabilityOfBeingAnswer.toFixed(4)
+  );
 
   const recommendation = getRecommendation(boards, cards);
   console.log(
-    "recommendation",
-    recommendation.flop,
-    recommendation.turn,
-    recommendation.river
+    "standard-mode recommendation:",
+    JSON.stringify([
+      ...recommendation.flop.flop,
+      recommendation.turn.card,
+      recommendation.river.card,
+    ])
   );
 
-  const boardPlayed: OldBoardCards = [
-    ["7", "♦"],
-    ["9", "♣"],
-    ["b", "♥"],
-    ["a", "♠"],
-    ["8", "♥"],
-  ];
-  const actualOutcome: ActualOutcome = ["🟩", "⬜️", "⬜️", "⬜️", "⬜️"];
-
-  const filteredBoards = filterBoards(boards, boardPlayed, actualOutcome);
-
-  console.log(filteredBoards.length);
-
-  const hardModeRecommendation2 = getHardModeRecommendation(filteredBoards);
-  console.log("hard-mode recommendation", hardModeRecommendation2);
-
-  const recommendation2 = getRecommendation(filteredBoards, cards);
-  console.log(
-    "recommendation",
-    recommendation2.flop,
-    recommendation2.turn,
-    recommendation2.river
-  );
-
-  // const boardPlayed2: BoardCards = [
-  //   ["2", "♠"],
-  //   ["7", "♠"],
-  //   ["c", "♣"],
-  //   ["9", "♣"],
-  //   ["b", "♠"],
+  // const playedBoard: BoardCards = [
+  //   new Card("7", "♦"),
+  //   new Card("9", "♣"),
+  //   new Card("J", "♥"),
+  //   new Card("10", "♠"),
+  //   new Card("8", "♥"),
   // ];
-  // const actualOutcome2: ActualOutcome = ["🟨", "🟨", "🟨", "🟨", "🟩"];
+  // const pattern: BoardPattern = ["🟩", "⬜️", "⬜️", "⬜️", "⬜️"];
 
-  // const filteredBoards2 = filterBoards(
-  //   filteredBoards,
-  //   boardPlayed2,
-  //   actualOutcome2
-  // );
+  // const filteredBoards = Pokle.keepOnlyBoardsMatchingPattern({
+  //   boards,
+  //   playedBoard,
+  //   pattern,
+  // });
 
-  // console.log(filteredBoards2.length);
+  // console.log(filteredBoards.length);
 
-  // const recommendation3 = getRecommendation(filteredBoards2, cards);
+  // const hardModeRecommendation2 = getHardModeRecommendation(filteredBoards);
+  // console.log("hard-mode recommendation", hardModeRecommendation2);
+
+  // const recommendation2 = getRecommendation(filteredBoards, cards);
   // console.log(
   //   "recommendation",
-  //   recommendation3.flop,
-  //   recommendation3.turn,
-  //   recommendation3.river
+  //   recommendation2.flop,
+  //   recommendation2.turn,
+  //   recommendation2.river
   // );
 };
 

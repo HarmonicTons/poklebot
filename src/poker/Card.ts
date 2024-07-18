@@ -90,6 +90,10 @@ export class Card {
     return `${this.rank}${this.suit}`;
   }
 
+  public toJSON(): CardString {
+    return this.toString();
+  }
+
   public static fromString(str: CardString): Card {
     return new Card(str[0] as CardRank, str[1] as CardSuit);
   }
