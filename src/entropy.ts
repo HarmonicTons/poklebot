@@ -114,16 +114,7 @@ export const getTurnsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
 
 export const getTurnRecommendation = (boards: BoardCards[], cards: Card[]) => {
   const turnsWithEntropy = getTurnsWithEntropy(boards, cards);
-  const solution = turnsWithEntropy.find(
-    ({ entropy, outcomesDistribution }) =>
-      entropy === 0 && outcomesDistribution["🟩"] > 0
-  );
-  if (solution) {
-    return solution;
-  } else {
-    const maxEntropyTurn = turnsWithEntropy[0];
-    return maxEntropyTurn;
-  }
+  return turnsWithEntropy[0];
 };
 
 export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
@@ -149,16 +140,70 @@ export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
 
 export const getRiverRecommendation = (boards: BoardCards[], cards: Card[]) => {
   const riversWithEntropy = getRiversWithEntropy(boards, cards);
-  const solution = riversWithEntropy.find(
-    ({ entropy, outcomesDistribution }) =>
-      entropy === 0 && outcomesDistribution["🟩"] > 0
-  );
-  if (solution) {
-    return solution;
-  } else {
-    const maxEntropyRiver = riversWithEntropy[0];
-    return maxEntropyRiver;
+  return riversWithEntropy[0];
+};
+
+export const boardIsValid = (board: BoardCards): boolean => {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = i + 1; j < board.length; j++) {
+      if (cardsAreEqual(board[i], board[j])) {
+        return false;
+      }
+    }
   }
+  return true;
+};
+
+export const getRecommendation = (boards: BoardCards[], cards: Card[]) => {
+  const flopsWithEntropy = getFlopsWithEntropy(boards, cards).slice(0, 10);
+  const turnsWithEntropy = getTurnsWithEntropy(boards, cards).slice(0, 10);
+  const riversWithEntropy = getRiversWithEntropy(boards, cards).slice(0, 10);
+
+  const firstRecommendation = {
+    flop: flopsWithEntropy[0],
+    turn: turnsWithEntropy[0],
+    river: riversWithEntropy[0],
+  };
+  const firstBoard = [
+    ...firstRecommendation.flop.flop,
+    firstRecommendation.turn.card,
+    firstRecommendation.river.card,
+  ] as BoardCards;
+  if (boardIsValid(firstBoard)) {
+    return firstRecommendation;
+  }
+
+  let bestRecommendation = {
+    flop: flopsWithEntropy[0],
+    turn: turnsWithEntropy[0],
+    river: riversWithEntropy[0],
+  };
+
+  let bestBoardRecommendationIndex = 0;
+  for (const flop of flopsWithEntropy) {
+    for (const turn of turnsWithEntropy) {
+      for (const river of riversWithEntropy) {
+        const board = [...flop.flop, turn.card, river.card] as BoardCards;
+        const boardRecommendationIndex =
+          flop.recommendationIndex +
+          turn.recommendationIndex +
+          river.recommendationIndex;
+        if (
+          boardIsValid(board) &&
+          boardRecommendationIndex > bestBoardRecommendationIndex
+        ) {
+          bestRecommendation = {
+            flop,
+            turn,
+            river,
+          };
+          bestBoardRecommendationIndex = boardRecommendationIndex;
+        }
+      }
+    }
+  }
+
+  return bestRecommendation;
 };
 
 export type ActualOutcome = [

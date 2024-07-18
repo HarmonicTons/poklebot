@@ -3,6 +3,7 @@ import {
   ActualOutcome,
   filterBoards,
   getFlopRecommendation,
+  getRecommendation,
   getRiverRecommendation,
   getTurnRecommendation,
 } from "./entropy";
@@ -137,12 +138,8 @@ const main = async () => {
 
   console.log(boards[0]);
 
-  const flopRecommendation = getFlopRecommendation(boards, cards);
-  console.log("flop", flopRecommendation);
-  const turnRecommendation = getTurnRecommendation(boards, cards);
-  console.log("turn", turnRecommendation);
-  const riverRecommendation = getRiverRecommendation(boards, cards);
-  console.log("river", riverRecommendation);
+  const recommendation = getRecommendation(boards, cards);
+  console.log("recommendation", recommendation);
 
   const boardPlayed: BoardCards = [
     ["2", "♥"],
@@ -157,12 +154,8 @@ const main = async () => {
 
   console.log(filteredBoards.length);
 
-  const flopRecommendation2 = getFlopRecommendation(filteredBoards, cards);
-  console.log("flop", flopRecommendation2);
-  const turnRecommendation2 = getTurnRecommendation(filteredBoards, cards);
-  console.log("turn", turnRecommendation2);
-  const riverRecommendation2 = getRiverRecommendation(filteredBoards, cards);
-  console.log("river", riverRecommendation2);
+  const recommendation2 = getRecommendation(filteredBoards, cards);
+  console.log("recommendation", recommendation2);
 };
 
 main()
