@@ -1,10 +1,10 @@
-import { orderBy, sumBy } from "lodash";
-import { brutForceSolution, Players, FlopCards, BoardCards } from "./brutForce";
-import { Card } from "./findHand";
+import { BoardCards, brutForceSolution, Players } from "./brutForce";
 import {
-  getFlopsWithEntropy,
-  getRiversWithEntropy,
-  getTurnsWithEntropy,
+  ActualOutcome,
+  filterBoards,
+  getFlopRecommendation,
+  getRiverRecommendation,
+  getTurnRecommendation,
 } from "./entropy";
 
 const players: Players = [
@@ -123,26 +123,46 @@ const players3: Players = [
     ],
   },
 ];
+const actualSolution3: BoardCards = [
+  ["7", "♦"],
+  ["7", "♠"],
+  ["c", "♠"],
+  ["c", "♦"],
+  ["c", "♣"],
+];
 
 const main = async () => {
   console.log("Start");
-  const { boards, cards } = brutForceSolution(players2);
+  const { boards, cards } = brutForceSolution(players3);
 
   console.log(boards[0]);
 
-  const flopsWithEntropy = getFlopsWithEntropy(boards, cards);
-  const bestFlopChoice = flopsWithEntropy[0];
-  console.log("flop", bestFlopChoice);
+  const flopRecommendation = getFlopRecommendation(boards, cards);
+  console.log("flop", flopRecommendation);
+  const turnRecommendation = getTurnRecommendation(boards, cards);
+  console.log("turn", turnRecommendation);
+  const riverRecommendation = getRiverRecommendation(boards, cards);
+  console.log("river", riverRecommendation);
 
-  // TURN
-  const turnsWithEntropy = getTurnsWithEntropy(boards, cards);
-  const bestTurnChoice = turnsWithEntropy[0];
-  console.log("turn", bestTurnChoice);
+  const boardPlayed: BoardCards = [
+    ["2", "♥"],
+    ["8", "♥"],
+    ["9", "♣"],
+    ["a", "♠"],
+    ["8", "♠"],
+  ];
+  const actualOutcome: ActualOutcome = ["⬜️", "⬜️", "⬜️", "⬜️", "⬜️"];
 
-  // RIVER
-  const riversWithEntropy = getRiversWithEntropy(boards, cards);
-  const bestRiverChoice = riversWithEntropy[0];
-  console.log("river", bestRiverChoice);
+  const filteredBoards = filterBoards(boards, boardPlayed, actualOutcome);
+
+  console.log(filteredBoards.length);
+
+  const flopRecommendation2 = getFlopRecommendation(filteredBoards, cards);
+  console.log("flop", flopRecommendation2);
+  const turnRecommendation2 = getTurnRecommendation(filteredBoards, cards);
+  console.log("turn", turnRecommendation2);
+  const riverRecommendation2 = getRiverRecommendation(filteredBoards, cards);
+  console.log("river", riverRecommendation2);
 };
 
 main()

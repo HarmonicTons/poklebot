@@ -1,11 +1,12 @@
 import { orderBy, sumBy } from "lodash";
 import { BoardCards, FlopCards } from "./brutForce";
-import { Card } from "./findHand";
+import { Card, cardsAreEqual } from "./findHand";
+import { Flop } from "./model";
 
 export const SINGLE_OUTCOMES = ["🟩", "🟨", "⬜️"] as const;
 export type SingleOutcome = (typeof SINGLE_OUTCOMES)[number];
 
-export type FlopOutcome = `${SingleOutcome}${SingleOutcome}${SingleOutcome}`;
+export type FlopOutcome = [SingleOutcome, SingleOutcome, SingleOutcome];
 
 export const getSingleOutcome = (c1: Card, c2: Card) => {
   if (c1[0] === c2[0] && c1[1] === c2[1]) {
@@ -29,7 +30,7 @@ export const getFlopSingleOutcome = (card: Card, flop: FlopCards) => {
 };
 export const getFlopOutcome = (f1: FlopCards, f2: FlopCards): FlopOutcome => {
   const outcomes = f1.map((card) => getFlopSingleOutcome(card, f2));
-  return outcomes.join("") as FlopOutcome;
+  return outcomes as FlopOutcome;
 };
 
 export const getEntropy = (
@@ -66,12 +67,28 @@ export const getFlopsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
   const flopsWithEntropy = flops.map((flop) => {
     const getOutcome = (board: BoardCards) => {
       const boardFlopCards = board.slice(0, 3) as FlopCards;
-      return getFlopOutcome(flop, boardFlopCards);
+      const outcome = getFlopOutcome(flop, boardFlopCards);
+      // sort because the order of the cards in the flop does not matter
+      return outcome.sort().join("");
     };
     const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
-    return { flop, entropy, outcomesDistribution };
+    const probabilityOfBeingAnswer =
+      (outcomesDistribution["🟩🟩🟩"] ?? 0) / boards.length;
+    const recommendationIndex = entropy + probabilityOfBeingAnswer;
+    return {
+      flop,
+      entropy,
+      outcomesDistribution,
+      probabilityOfBeingAnswer,
+      recommendationIndex,
+    };
   });
-  return orderBy(flopsWithEntropy, "entropy", "desc");
+  return orderBy(flopsWithEntropy, "recommendationIndex", "desc");
+};
+
+export const getFlopRecommendation = (boards: BoardCards[], cards: Card[]) => {
+  const flopsWithEntropy = getFlopsWithEntropy(boards, cards);
+  return flopsWithEntropy[0];
 };
 
 export const getTurnsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
@@ -81,9 +98,32 @@ export const getTurnsWithEntropy = (boards: BoardCards[], cards: Card[]) => {
       return getSingleOutcome(card, boardTurnCard);
     };
     const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
-    return { card, entropy, outcomesDistribution };
+    const probabilityOfBeingAnswer =
+      (outcomesDistribution["🟩"] ?? 0) / boards.length;
+    const recommendationIndex = entropy + probabilityOfBeingAnswer;
+    return {
+      card,
+      entropy,
+      outcomesDistribution,
+      probabilityOfBeingAnswer,
+      recommendationIndex,
+    };
   });
-  return orderBy(turnsWithEntropy, "entropy", "desc");
+  return orderBy(turnsWithEntropy, "recommendationIndex", "desc");
+};
+
+export const getTurnRecommendation = (boards: BoardCards[], cards: Card[]) => {
+  const turnsWithEntropy = getTurnsWithEntropy(boards, cards);
+  const solution = turnsWithEntropy.find(
+    ({ entropy, outcomesDistribution }) =>
+      entropy === 0 && outcomesDistribution["🟩"] > 0
+  );
+  if (solution) {
+    return solution;
+  } else {
+    const maxEntropyTurn = turnsWithEntropy[0];
+    return maxEntropyTurn;
+  }
 };
 
 export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
@@ -93,7 +133,63 @@ export const getRiversWithEntropy = (boards: BoardCards[], cards: Card[]) => {
       return getSingleOutcome(card, boardRiverCard);
     };
     const { entropy, outcomesDistribution } = getEntropy(boards, getOutcome);
-    return { card, entropy, outcomesDistribution };
+    const probabilityOfBeingAnswer =
+      (outcomesDistribution["🟩"] ?? 0) / boards.length;
+    const recommendationIndex = entropy + probabilityOfBeingAnswer;
+    return {
+      card,
+      entropy,
+      outcomesDistribution,
+      probabilityOfBeingAnswer,
+      recommendationIndex,
+    };
   });
-  return orderBy(riversWithEntropy, "entropy", "desc");
+  return orderBy(riversWithEntropy, "recommendationIndex", "desc");
+};
+
+export const getRiverRecommendation = (boards: BoardCards[], cards: Card[]) => {
+  const riversWithEntropy = getRiversWithEntropy(boards, cards);
+  const solution = riversWithEntropy.find(
+    ({ entropy, outcomesDistribution }) =>
+      entropy === 0 && outcomesDistribution["🟩"] > 0
+  );
+  if (solution) {
+    return solution;
+  } else {
+    const maxEntropyRiver = riversWithEntropy[0];
+    return maxEntropyRiver;
+  }
+};
+
+export type ActualOutcome = [
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome,
+  SingleOutcome
+];
+
+export const filterBoards = (
+  boards: BoardCards[],
+  boardPlayed: BoardCards,
+  actualOutcome: ActualOutcome
+): BoardCards[] => {
+  return boards.filter((board) => {
+    const flopOutcome = getFlopOutcome(
+      boardPlayed.slice(0, 3) as FlopCards,
+      board.slice(0, 3) as FlopCards
+    );
+    if (flopOutcome.join("") !== actualOutcome.slice(0, 3).join("")) {
+      return false;
+    }
+    const turnOutcome = getSingleOutcome(boardPlayed[3], board[3]);
+    if (turnOutcome !== actualOutcome[3]) {
+      return false;
+    }
+    const riverOutcome = getSingleOutcome(boardPlayed[4], board[4]);
+    if (riverOutcome !== actualOutcome[4]) {
+      return false;
+    }
+    return true;
+  });
 };

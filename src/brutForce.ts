@@ -1,6 +1,7 @@
 import {
   Card,
   CARD_COLORS,
+  cardsAreEqual,
   ENCODED_CARD_VALUES,
   findHandType,
   getAllHandsOutOf6Cards,
@@ -44,7 +45,7 @@ export const brutForceSolution = (
 };
 
 export const getValidCards = (players: Players): Card[] => {
-  // TODO remove random kickers
+  // TODO remove obvious kickers (cannot be part of any straight)
   const usedCards: Record<string, boolean> = {};
   players.forEach((player) => {
     player.cards.forEach(([v, c]) => {
@@ -275,28 +276,25 @@ export const filterOutBoardsContainingKickers = (
   let n = 0;
   const filteredBoards: BoardCards[] = [];
   for (const board of boards) {
-    const kickers = [...board];
+    const boardCards = board.map((card) => ({
+      card,
+      isKicker: true,
+    }));
 
     const flopCards = board.slice(0, 3);
     const turnCards = board.slice(0, 4);
     const riverCards = [...board];
 
     for (const player of players) {
-      if (kickers.length === 0) {
-        break;
-      }
-      kickers.forEach((kicker) => {
+      boardCards.forEach((boardCard) => {
         if (
-          kicker[0] === player.cards[0][0] ||
-          kicker[0] === player.cards[1][0]
+          boardCard.card[0] === player.cards[0][0] ||
+          boardCard.card[0] === player.cards[1][0]
         ) {
-          kickers.splice(kickers.indexOf(kicker), 1);
+          boardCard.isKicker = false;
         }
       });
       for (const cards of [flopCards, turnCards, riverCards]) {
-        if (kickers.length === 0) {
-          break;
-        }
         const allCards = [...cards, ...player.cards];
         const { handType, scoringCards: playerScoringCards } =
           findHandType(allCards);
@@ -306,12 +304,12 @@ export const filterOutBoardsContainingKickers = (
           handType === getEncodedHandType("SF")
         ) {
           playerScoringCards.forEach((scoringCard) => {
-            kickers.forEach((kicker) => {
+            boardCards.forEach((boardCard) => {
               if (
-                kicker[0] === scoringCard[0] ||
-                kicker[0] === scoringCard[0]
+                boardCard.card[0] === scoringCard[0] ||
+                boardCard.card[0] === scoringCard[0]
               ) {
-                kickers.splice(kickers.indexOf(kicker), 1);
+                boardCard.isKicker = false;
               }
             });
           });
@@ -319,6 +317,7 @@ export const filterOutBoardsContainingKickers = (
       }
     }
     n++;
+    const kickers = boardCards.filter((b) => b.isKicker);
     if (kickers.length === 0) {
       filteredBoards.push(board);
     }

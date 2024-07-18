@@ -57,6 +57,10 @@ export type CardColor = (typeof CARD_COLORS)[number];
 
 export type Card = [EncodedCardValue, CardColor];
 
+export const cardsAreEqual = (card1: Card, card2: Card) => {
+  return card1[0] === card2[0] && card1[1] === card2[1];
+};
+
 export type HandCards = [Card, Card, Card, Card, Card];
 
 export const HAND_TYPES = [

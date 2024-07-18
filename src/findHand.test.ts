@@ -232,4 +232,31 @@ describe("get score", () => {
 
     expect(findHandType(handCards).handScore).toBe("5c9863");
   });
+
+  it("too many pairs", () => {
+    const handCards: Card[] = [
+      ["7", "♦"],
+      ["7", "♠"],
+      ["c", "♠"],
+      ["c", "♦"],
+      ["c", "♣"],
+      ["c", "♥"],
+      ["8", "♦"],
+    ];
+
+    expect(findHandType(handCards).handScore).toBe("7cccc8");
+  });
+
+  it("6 cards", () => {
+    const handCards: Card[] = [
+      ["7", "♦"],
+      ["7", "♠"],
+      ["c", "♠"],
+      ["c", "♦"],
+      ["c", "♥"],
+      ["8", "♦"],
+    ];
+
+    expect(findHandType(handCards).handScore).toBe("6ccc77");
+  });
 });
