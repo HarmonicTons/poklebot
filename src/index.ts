@@ -38,7 +38,6 @@ const pokle = new Pokle(745, players);
 const main = async () => {
   console.log("PokleBot");
   pokle.solve();
-  const cards = pokle.validCards as Card[];
 
   console.log("Possible boards:", (pokle.remaingBoards as BoardCards[]).length);
 
