@@ -5,8 +5,8 @@ import { BoardCards } from "./poker/Poker";
 import { Pokle, Players, BoardPattern } from "./pokle/Pokle";
 import games from "./games.json";
 
-const gameId = 745;
-const pokle = Pokle.fromJSON(gameId, (games as any)[gameId]);
+const game = games.games[games.games.length - 1];
+const pokle = Pokle.fromJSON(game.id, game.players);
 
 const main = async () => {
   console.log("PokleBot");
