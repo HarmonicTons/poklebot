@@ -3,37 +3,10 @@ import { getStandardRecommendation } from "./bot/standard";
 import { Card } from "./poker/Card";
 import { BoardCards } from "./poker/Poker";
 import { Pokle, Players, BoardPattern } from "./pokle/Pokle";
+import games from "./games.json";
 
-const players: Players = [
-  {
-    name: "Jaz",
-    positions: {
-      flop: 3,
-      turn: 3,
-      river: 1,
-    },
-    cards: [new Card("10", "♦"), new Card("J", "♠")],
-  },
-  {
-    name: "Baz",
-    positions: {
-      flop: 1,
-      turn: 2,
-      river: 3,
-    },
-    cards: [new Card("J", "♦"), new Card("3", "♦")],
-  },
-  {
-    name: "Raz",
-    positions: {
-      flop: 2,
-      turn: 1,
-      river: 2,
-    },
-    cards: [new Card("4", "♣"), new Card("3", "♠")],
-  },
-];
-const pokle = new Pokle(745, players);
+const gameId = 745;
+const pokle = Pokle.fromJSON(gameId, (games as any)[gameId]);
 
 const main = async () => {
   console.log("PokleBot");

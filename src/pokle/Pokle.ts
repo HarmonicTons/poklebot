@@ -414,4 +414,23 @@ export class Pokle {
 
     return pokleSummary + "\n" + patterns + "\n\nGuesses:\n" + playedBoards;
   }
+
+  public static fromJSON(gameId: number, json: any): Pokle {
+    const players: Players = json.map((playerJson: any) => {
+      const player: Player = {
+        name: playerJson.name,
+        cards: playerJson.cards.map((cardJson: any) =>
+          Card.fromString(cardJson)
+        ),
+        positions: {
+          flop: Number(playerJson.positions.flop) as PlayerPosition,
+          turn: Number(playerJson.positions.turn) as PlayerPosition,
+          river: Number(playerJson.positions.river) as PlayerPosition,
+        },
+      };
+      return player;
+    });
+
+    return new Pokle(gameId, players);
+  }
 }

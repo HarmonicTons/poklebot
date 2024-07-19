@@ -95,7 +95,7 @@ export class Card {
   }
 
   public static fromString(str: CardString): Card {
-    return new Card(str[0] as CardRank, str[1] as CardSuit);
+    return new Card(str.slice(0, -1) as CardRank, str.slice(-1) as CardSuit);
   }
 
   public toHexArray(): CardHexArray {
