@@ -2,7 +2,12 @@ import { getChoicesWithRecommendations } from "../entropy/entropy";
 import { BoardCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 
-export const getBoardsWithRecommendations = (boards: BoardCards[]) => {
+export const getBoardsWithRecommendations = (pokle: Pokle) => {
+  const boards = pokle.remaingBoards;
+  if (boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+
   return getChoicesWithRecommendations({
     choices: boards,
     possibleAnswers: boards,
@@ -14,7 +19,7 @@ export const getBoardsWithRecommendations = (boards: BoardCards[]) => {
   });
 };
 
-export const getHardModeRecommendation = (boards: BoardCards[]) => {
-  const boardsWithEntropy = getBoardsWithRecommendations(boards);
+export const getHardModeRecommendation = (pokle: Pokle) => {
+  const boardsWithEntropy = getBoardsWithRecommendations(pokle);
   return boardsWithEntropy[0];
 };

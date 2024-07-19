@@ -44,7 +44,6 @@ export class Pokle {
   public possibleFlops: FlopCards[] | null = null;
   public possibleTurns: TurnCards[] | null = null;
   public possibleRivers: RiverCards[] | null = null;
-  public possibleBoards: BoardCards[] | null = null;
   public validBoards: BoardCards[] | null = null;
 
   public guesses: Guess[] = [];
@@ -270,11 +269,17 @@ export class Pokle {
   }
 
   public solve(): void {
+    console.debug("Solving Pokle...");
     this.getAllValidCards();
+    console.debug(`${this.validCards?.length} valid cards`);
     this.getAllPossibleFlops();
+    console.debug(`${this.possibleFlops?.length} possible flops`);
     this.getAllPossibleTurns();
+    console.debug(`${this.possibleTurns?.length} possible turns`);
     this.getAllPossibleRivers();
+    console.debug(`${this.possibleRivers?.length} possible rivers`);
     this.keepOnlyValidBoards();
+    console.debug(`${this.validBoards?.length} valid boards`);
     this.isSolved = true;
   }
 

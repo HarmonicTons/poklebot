@@ -3,10 +3,13 @@ import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 
-export const getFlopsWithRecommendations = (
-  boards: BoardCards[],
-  cards: Card[]
-) => {
+export const getFlopsWithRecommendations = (pokle: Pokle) => {
+  const cards = pokle.validCards;
+  const boards = pokle.remaingBoards;
+  if (cards === null || boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+
   const flops: FlopCards[] = [];
   for (let i = 0; i < cards.length; i++) {
     for (let j = i + 1; j < cards.length; j++) {
@@ -30,10 +33,13 @@ export const getFlopsWithRecommendations = (
   });
 };
 
-export const getTurnsWithRecommendations = (
-  boards: BoardCards[],
-  cards: Card[]
-) => {
+export const getTurnsWithRecommendations = (pokle: Pokle) => {
+  const cards = pokle.validCards;
+  const boards = pokle.remaingBoards;
+  if (cards === null || boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
@@ -44,10 +50,13 @@ export const getTurnsWithRecommendations = (
   });
 };
 
-export const getRiversWithRecommendations = (
-  boards: BoardCards[],
-  cards: Card[]
-) => {
+export const getRiversWithRecommendations = (pokle: Pokle) => {
+  const cards = pokle.validCards;
+  const boards = pokle.remaingBoards;
+  if (cards === null || boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
@@ -74,22 +83,10 @@ export const boardIsValid = (board: BoardCards): boolean => {
   return true;
 };
 
-export const getStandardRecommendation = (
-  boards: BoardCards[],
-  cards: Card[]
-) => {
-  const flopsWithEntropy = getFlopsWithRecommendations(boards, cards).slice(
-    0,
-    10
-  );
-  const turnsWithEntropy = getTurnsWithRecommendations(boards, cards).slice(
-    0,
-    10
-  );
-  const riversWithEntropy = getRiversWithRecommendations(boards, cards).slice(
-    0,
-    10
-  );
+export const getStandardRecommendation = (pokle: Pokle) => {
+  const flopsWithEntropy = getFlopsWithRecommendations(pokle).slice(0, 10);
+  const turnsWithEntropy = getTurnsWithRecommendations(pokle).slice(0, 10);
+  const riversWithEntropy = getRiversWithRecommendations(pokle).slice(0, 10);
 
   const firstRecommendation = {
     flop: flopsWithEntropy[0],

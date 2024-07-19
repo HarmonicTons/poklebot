@@ -42,9 +42,7 @@ const main = async () => {
 
   console.log("Possible boards:", (pokle.remaingBoards as BoardCards[]).length);
 
-  const hardModeRecommendation = getHardModeRecommendation(
-    pokle.remaingBoards as BoardCards[]
-  );
+  const hardModeRecommendation = getHardModeRecommendation(pokle);
   console.log(
     "hard-mode recommendation:",
     JSON.stringify(hardModeRecommendation.choice),
@@ -54,12 +52,9 @@ const main = async () => {
     hardModeRecommendation.probabilityOfBeingAnswer.toFixed(4)
   );
 
-  const recommendation = getStandardRecommendation(
-    pokle.remaingBoards as BoardCards[],
-    cards
-  );
+  const recommendation = getStandardRecommendation(pokle);
   console.log(
-    "standard-mode recommendation:",
+    "standard recommendation:",
     JSON.stringify([
       ...recommendation.flop.choice,
       recommendation.turn.choice,
@@ -86,9 +81,7 @@ const main = async () => {
     (pokle.remaingBoards as BoardCards[]).length
   );
 
-  const hardModeRecommendation2 = getHardModeRecommendation(
-    pokle.remaingBoards as BoardCards[]
-  );
+  const hardModeRecommendation2 = getHardModeRecommendation(pokle);
   console.log(
     "hard-mode recommendation:",
     JSON.stringify(hardModeRecommendation2.choice),
@@ -98,12 +91,9 @@ const main = async () => {
     hardModeRecommendation2.probabilityOfBeingAnswer.toFixed(4)
   );
 
-  const recommendation2 = getStandardRecommendation(
-    pokle.remaingBoards as BoardCards[],
-    cards
-  );
+  const recommendation2 = getStandardRecommendation(pokle);
   console.log(
-    "standard-mode recommendation:",
+    "standard recommendation:",
     JSON.stringify([
       ...recommendation2.flop.choice,
       recommendation2.turn.choice,
@@ -132,9 +122,7 @@ const main = async () => {
     (pokle.remaingBoards as BoardCards[]).length
   );
 
-  const hardModeRecommendation3 = getHardModeRecommendation(
-    pokle.remaingBoards as BoardCards[]
-  );
+  const hardModeRecommendation3 = getHardModeRecommendation(pokle);
   console.log(
     "hard-mode recommendation:",
     JSON.stringify(hardModeRecommendation3.choice),
@@ -144,12 +132,9 @@ const main = async () => {
     hardModeRecommendation3.probabilityOfBeingAnswer.toFixed(4)
   );
 
-  const recommendation3 = getStandardRecommendation(
-    pokle.remaingBoards as BoardCards[],
-    cards
-  );
+  const recommendation3 = getStandardRecommendation(pokle);
   console.log(
-    "standard-mode recommendation:",
+    "standard recommendation:",
     JSON.stringify([
       ...recommendation3.flop.choice,
       recommendation3.turn.choice,
@@ -167,37 +152,6 @@ const main = async () => {
     ],
     pattern: ["🟩", "🟩", "🟩", "🟩", "🟩"],
   });
-
-  //
-  /*
-  const playedBoard3: BoardCards = [
-    new Card("3", "♥"),
-    new Card("9", "♠"),
-    new Card("K", "♣"),
-    new Card("4", "♦"),
-    new Card("Q", "♠"),
-  ];
-  const pattern3: BoardPattern = ["🟩", "🟩", "⬜️", "🟩", "🟩"];
-
-  const filteredBoards3 = Pokle.keepOnlyBoardsMatchingPattern({
-    boards: filteredBoards2,
-    playedBoard: playedBoard3,
-    pattern: pattern3,
-  });
-
-  console.log("Remaining boards:", filteredBoards3.length);
-
-  const hardModeRecommendation4 = getHardModeRecommendation(filteredBoards3);
-  console.log(
-    "hard-mode recommendation:",
-    JSON.stringify(hardModeRecommendation4.board),
-    "- E:",
-    hardModeRecommendation4.entropy.toFixed(4),
-    " P:",
-    hardModeRecommendation4.probabilityOfBeingAnswer.toFixed(4)
-  );
-
-  */
 
   console.log(pokle.toString());
 };
