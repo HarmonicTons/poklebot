@@ -1,8 +1,8 @@
-import { getFlopsWithRecommendations } from "./entropy";
-import { Card, CardHexArray, CardSuit, HexCardRank } from "./poker/Card";
-import { BoardCards } from "./poker/Poker";
+import { getFlopsWithRecommendations } from "./standard";
+import { Card } from "../poker/Card";
+import { BoardCards } from "../poker/Poker";
 
-describe("entropy", () => {
+describe("standard bot", () => {
   it("2 remainings boards", () => {
     const cards: Card[] = [
       new Card("2", "♠"),

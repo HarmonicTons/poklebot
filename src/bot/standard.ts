@@ -1,19 +1,7 @@
-import { getChoicesWithRecommendations } from "./entropy/Entropy";
-import { Card } from "./poker/Card";
-import { BoardCards, FlopCards } from "./poker/Poker";
-import { Pokle } from "./pokle/Pokle";
-
-export const getBoardsWithRecommendations = (boards: BoardCards[]) => {
-  return getChoicesWithRecommendations({
-    choices: boards,
-    possibleAnswers: boards,
-    getOutcome: (board1, board2) =>
-      Pokle.getBoardPattern(board1, board2).join(""),
-    getProbabilityOfBeingAnswer: (outcomes) => {
-      return outcomes["🟩🟩🟩🟩🟩"] ?? 0;
-    },
-  });
-};
+import { getChoicesWithRecommendations } from "../entropy/entropy";
+import { Card } from "../poker/Card";
+import { BoardCards, FlopCards } from "../poker/Poker";
+import { Pokle } from "../pokle/Pokle";
 
 export const getFlopsWithRecommendations = (
   boards: BoardCards[],
@@ -37,7 +25,7 @@ export const getFlopsWithRecommendations = (
         .sort()
         .join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return outcomes["🟩🟩🟩"] ?? 0;
+      return (outcomes["🟩🟩🟩"] ?? 0) / boards.length;
     },
   });
 };
@@ -51,7 +39,7 @@ export const getTurnsWithRecommendations = (
     possibleAnswers: boards,
     getOutcome: (card, board) => Pokle.getCardPattern(card, board[3]),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return outcomes["🟩"] ?? 0;
+      return (outcomes["🟩"] ?? 0) / boards.length;
     },
   });
 };
@@ -65,11 +53,14 @@ export const getRiversWithRecommendations = (
     possibleAnswers: boards,
     getOutcome: (card, board) => Pokle.getCardPattern(card, board[4]),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return outcomes["🟩"] ?? 0;
+      return (outcomes["🟩"] ?? 0) / boards.length;
     },
   });
 };
 
+/**
+ * Check that no card is duplicated in the board
+ */
 export const boardIsValid = (board: BoardCards): boolean => {
   for (let i = 0; i < board.length; i++) {
     for (let j = i + 1; j < board.length; j++) {
@@ -83,12 +74,10 @@ export const boardIsValid = (board: BoardCards): boolean => {
   return true;
 };
 
-export const getHardModeRecommendation = (boards: BoardCards[]) => {
-  const boardsWithEntropy = getBoardsWithRecommendations(boards);
-  return boardsWithEntropy[0];
-};
-
-export const getRecommendation = (boards: BoardCards[], cards: Card[]) => {
+export const getStandardRecommendation = (
+  boards: BoardCards[],
+  cards: Card[]
+) => {
   const flopsWithEntropy = getFlopsWithRecommendations(boards, cards).slice(
     0,
     10
@@ -116,6 +105,7 @@ export const getRecommendation = (boards: BoardCards[], cards: Card[]) => {
     return firstRecommendation;
   }
 
+  // look for the valid board with the highest recommendation index
   let bestRecommendation = {
     flop: flopsWithEntropy[0],
     turn: turnsWithEntropy[0],

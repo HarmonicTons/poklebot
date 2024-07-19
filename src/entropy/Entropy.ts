@@ -9,6 +9,7 @@ type ChoiceWithRecommendation<C, O extends string | number> = {
   outcomes: OutcomesDistribution<O>;
   entropy: Entropy;
   recommendationIndex: RecommendationIndex;
+  probabilityOfBeingAnswer: number;
 };
 
 /**
@@ -75,16 +76,13 @@ export const getEntropy = <O extends string | number>({
 /**
  * Get the recommendation index of a choice from its outcomes and entropy
  */
-export const getRecommendationIndex = <O extends string | number>({
-  outcomes,
+export const getRecommendationIndex = ({
   entropy,
-  getProbabilityOfBeingAnswer,
+  probabilityOfBeingAnswer,
 }: {
-  outcomes: OutcomesDistribution<O>;
   entropy: number;
-  getProbabilityOfBeingAnswer: GetProbabilityOfBeingAnswer<O>;
+  probabilityOfBeingAnswer: number;
 }): number => {
-  const probabilityOfBeingAnswer = getProbabilityOfBeingAnswer(outcomes);
   return entropy + probabilityOfBeingAnswer;
 };
 
@@ -111,16 +109,18 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
       getOutcome,
     });
     const entropy = getEntropy({ outcomes });
+    const probabilityOfBeingAnswer = getProbabilityOfBeingAnswer(outcomes);
     const recommendationIndex = getRecommendationIndex({
-      outcomes,
       entropy,
-      getProbabilityOfBeingAnswer,
+      probabilityOfBeingAnswer,
     });
+
     return {
       choice,
       outcomes,
       entropy,
       recommendationIndex,
+      probabilityOfBeingAnswer,
     };
   });
   return orderBy(choicesWithRecommendations, "recommendationIndex", "desc");
