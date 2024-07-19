@@ -2,6 +2,9 @@ import playwright from "playwright";
 import { getStandardRecommendation } from "./bot/standard";
 import { closeAllModals, getPlayers, submitGuess } from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
+import { getHardModeRecommendation } from "./bot/hardMode";
+
+const playInHardMode = false;
 
 const main = async () => {
   console.log("Fetching today's Pokle...");
@@ -15,17 +18,21 @@ const main = async () => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
+  const statsPromise = page.waitForRequest("/stats_add.php");
+
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    const recommendation = getStandardRecommendation(pokle);
+    const nextGuess = playInHardMode
+      ? getHardModeRecommendation(pokle).choice
+      : getStandardRecommendation(pokle).boardCards;
 
     console.log(
       "Playing:",
-      recommendation.boardCards.map((card) => card.toString())
+      nextGuess.map((card) => card.toString())
     );
 
     const boardPattern = await submitGuess(
       page,
-      recommendation.boardCards,
+      nextGuess,
       guessNumber as 1 | 2 | 3 | 4 | 5 | 6
     );
 
@@ -36,12 +43,14 @@ const main = async () => {
     }
 
     pokle.guessBoard({
-      playedBoard: recommendation.boardCards,
+      playedBoard: nextGuess,
       pattern: boardPattern,
     });
   }
 
   await page.screenshot({ path: "screen.png" });
+
+  await statsPromise;
 
   await browser.close();
 };
