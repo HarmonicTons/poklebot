@@ -32,14 +32,14 @@ const players: Players = [
     cards: [new Card("4", "♣"), new Card("3", "♠")],
   },
 ];
-const pokle = new Pokle(players);
+const pokle = new Pokle(745, players);
 
 const main = async () => {
   console.log("PokleBot");
-  const cards = pokle.validCards;
-  const boards = pokle.solve();
+  pokle.solve();
+  const cards = pokle.validCards as Card[];
 
-  console.log("Possible boards:", boards.length);
+  console.log("Possible boards:", (pokle.remaingBoards as BoardCards[]).length);
 
   // const hardModeRecommendation = getHardModeRecommendation(boards);
   // console.log(
@@ -51,7 +51,10 @@ const main = async () => {
   //   hardModeRecommendation.probabilityOfBeingAnswer.toFixed(4)
   // );
 
-  const recommendation = getRecommendation(boards, cards);
+  const recommendation = getRecommendation(
+    pokle.remaingBoards as BoardCards[],
+    cards
+  );
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
@@ -70,13 +73,15 @@ const main = async () => {
   ];
   const pattern: BoardPattern = ["🟨", "🟨", "🟨", "🟨", "⬜️"];
 
-  const filteredBoards = Pokle.keepOnlyBoardsMatchingPattern({
-    boards,
+  pokle.guessBoard({
     playedBoard,
     pattern,
   });
 
-  console.log("Remaining boards:", filteredBoards.length);
+  console.log(
+    "Remaining boards:",
+    (pokle.remaingBoards as BoardCards[]).length
+  );
 
   // const hardModeRecommendation2 = getHardModeRecommendation(filteredBoards);
   // console.log(
@@ -88,7 +93,10 @@ const main = async () => {
   //   hardModeRecommendation2.probabilityOfBeingAnswer.toFixed(4)
   // );
 
-  const recommendation2 = getRecommendation(filteredBoards, cards);
+  const recommendation2 = getRecommendation(
+    pokle.remaingBoards as BoardCards[],
+    cards
+  );
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
@@ -109,13 +117,15 @@ const main = async () => {
   ];
   const pattern2: BoardPattern = ["🟨", "🟨", "🟨", "🟨", "🟩"];
 
-  const filteredBoards2 = Pokle.keepOnlyBoardsMatchingPattern({
-    boards: filteredBoards,
+  pokle.guessBoard({
     playedBoard: playedBoard2,
     pattern: pattern2,
   });
 
-  console.log("Remaining boards:", filteredBoards2.length);
+  console.log(
+    "Remaining boards:",
+    (pokle.remaingBoards as BoardCards[]).length
+  );
 
   // const hardModeRecommendation3 = getHardModeRecommendation(filteredBoards2);
   // console.log(
@@ -127,7 +137,10 @@ const main = async () => {
   //   hardModeRecommendation3.probabilityOfBeingAnswer.toFixed(4)
   // );
 
-  const recommendation3 = getRecommendation(filteredBoards2, cards);
+  const recommendation3 = getRecommendation(
+    pokle.remaingBoards as BoardCards[],
+    cards
+  );
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
@@ -136,6 +149,17 @@ const main = async () => {
       recommendation3.river.card,
     ])
   );
+
+  pokle.guessBoard({
+    playedBoard: [
+      new Card("3", "♥"),
+      new Card("8", "♦"),
+      new Card("9", "♠"),
+      new Card("4", "♦"),
+      new Card("Q", "♠"),
+    ],
+    pattern: ["🟩", "🟩", "🟩", "🟩", "🟩"],
+  });
 
   //
   /*
@@ -167,6 +191,8 @@ const main = async () => {
   );
 
   */
+
+  console.log(pokle.toString());
 };
 
 main()

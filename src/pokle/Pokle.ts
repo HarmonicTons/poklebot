@@ -31,13 +31,36 @@ export type BoardPattern = [
   CardPattern
 ];
 
+export type Guess = {
+  number: number;
+  playedBoard: BoardCards;
+  pattern: BoardPattern;
+  remainingBoards: BoardCards[];
+};
+
 export class Pokle {
-  public validCards: Card[];
-  constructor(public readonly players: Players) {
-    this.validCards = this.getAllValidCards();
+  public isSolved = false;
+  public validCards: Card[] | null = null;
+  public possibleFlops: FlopCards[] | null = null;
+  public possibleTurns: TurnCards[] | null = null;
+  public possibleRivers: RiverCards[] | null = null;
+  public possibleBoards: BoardCards[] | null = null;
+  public validBoards: BoardCards[] | null = null;
+
+  public guesses: Guess[] = [];
+
+  constructor(
+    public readonly gameId: number,
+    public readonly players: Players
+  ) {}
+
+  public get remaingBoards() {
+    return this.guesses.length === 0
+      ? this.validBoards
+      : this.guesses[this.guesses.length - 1].remainingBoards;
   }
 
-  private getAllValidCards() {
+  public getAllValidCards() {
     // TODO remove obvious kickers (cannot be part of any straight)
     const usedCards: Record<string, boolean> = {};
     this.players.forEach((player) => {
@@ -57,7 +80,7 @@ export class Pokle {
       }
     }
 
-    return validCards;
+    this.validCards = validCards;
   }
 
   public areScoreValids({
@@ -119,7 +142,10 @@ export class Pokle {
     return true;
   }
 
-  public getAllPossibleFlops(): FlopCards[] {
+  public getAllPossibleFlops(): void {
+    if (this.validCards === null) {
+      throw new Error("validCards must be set before calling this method");
+    }
     let flops: FlopCards[] = [];
 
     for (let ci1 = 0; ci1 < this.validCards.length; ci1++) {
@@ -137,13 +163,16 @@ export class Pokle {
       }
     }
 
-    return flops;
+    this.possibleFlops = flops;
   }
 
-  public getAllPossibleTurns({ flops }: { flops: FlopCards[] }): TurnCards[] {
+  public getAllPossibleTurns(): void {
+    if (this.validCards === null || this.possibleFlops === null) {
+      throw new Error("possibleFlops must be set before calling this method");
+    }
     let turns: TurnCards[] = [];
 
-    for (const flop of flops) {
+    for (const flop of this.possibleFlops) {
       for (let ci1 = 0; ci1 < this.validCards.length; ci1++) {
         const c1 = this.validCards[ci1];
         const isUsed = flop.some((flopCard) => flopCard.isEqual(c1));
@@ -159,13 +188,16 @@ export class Pokle {
       }
     }
 
-    return turns;
+    this.possibleTurns = turns;
   }
 
-  public getAllPossibleRivers({ turns }: { turns: TurnCards[] }): RiverCards[] {
+  public getAllPossibleRivers(): void {
+    if (this.validCards === null || this.possibleTurns === null) {
+      throw new Error("possibleTurns must be set before calling this method");
+    }
     let rivers: RiverCards[] = [];
 
-    for (const turn of turns) {
+    for (const turn of this.possibleTurns) {
       for (let ci1 = 0; ci1 < this.validCards.length; ci1++) {
         const c1 = this.validCards[ci1];
         const isUsed = turn.some((turnCard) => turnCard.isEqual(c1));
@@ -181,16 +213,16 @@ export class Pokle {
       }
     }
 
-    return rivers;
+    this.possibleRivers = rivers;
   }
 
-  public keepOnlyValidBoards({
-    rivers,
-  }: {
-    rivers: RiverCards[];
-  }): BoardCards[] {
+  public keepOnlyValidBoards(): void {
+    if (this.possibleRivers === null) {
+      throw new Error("possibleRivers must be set before calling this method");
+    }
+
     const validBoards: BoardCards[] = [];
-    for (const board of rivers) {
+    for (const board of this.possibleRivers) {
       const boardCards = board.map((card) => ({
         card,
         isKicker: true,
@@ -234,15 +266,16 @@ export class Pokle {
       }
     }
 
-    return validBoards;
+    this.validBoards = validBoards;
   }
 
-  public solve(): BoardCards[] {
-    const flops = this.getAllPossibleFlops();
-    const turns = this.getAllPossibleTurns({ flops });
-    const rivers = this.getAllPossibleRivers({ turns });
-    const boards = this.keepOnlyValidBoards({ rivers });
-    return boards;
+  public solve(): void {
+    this.getAllValidCards();
+    this.getAllPossibleFlops();
+    this.getAllPossibleTurns();
+    this.getAllPossibleRivers();
+    this.keepOnlyValidBoards();
+    this.isSolved = true;
   }
 
   public static getCardPattern(card1: Card, card2: Card): CardPattern {
@@ -294,16 +327,40 @@ export class Pokle {
     return [...flopPattern, turnPattern, riverPattern] as BoardPattern;
   };
 
-  public static keepOnlyBoardsMatchingPattern({
-    boards,
+  public static getPattern(playedCards: Card[], actualCards: Card[]): string[] {
+    if (playedCards.length !== actualCards.length) {
+      throw new Error("playedCards and actualCards must have the same length");
+    }
+    if (playedCards.length === 1) {
+      return [Pokle.getCardPattern(playedCards[0], actualCards[0])];
+    }
+    if (playedCards.length === 3) {
+      return Pokle.getFlopPattern(
+        playedCards as FlopCards,
+        actualCards as FlopCards
+      );
+    }
+    if (playedCards.length === 5) {
+      return Pokle.getBoardPattern(
+        playedCards as BoardCards,
+        actualCards as BoardCards
+      );
+    }
+    throw new Error("Unsupported number of cards");
+  }
+
+  public guessBoard({
     playedBoard,
     pattern,
   }: {
-    boards: BoardCards[];
     playedBoard: BoardCards;
     pattern: BoardPattern;
-  }) {
-    return boards.filter((board) => {
+  }): void {
+    if (this.remaingBoards === null) {
+      throw new Error("Pokle must be solved before");
+    }
+
+    const nextRemaingBoards = this.remaingBoards.filter((board) => {
       const flopPattern = Pokle.getFlopPattern(
         playedBoard.slice(0, 3) as FlopCards,
         board.slice(0, 3) as FlopCards
@@ -321,5 +378,35 @@ export class Pokle {
       }
       return true;
     });
+
+    this.guesses.push({
+      number: this.guesses.length + 1,
+      playedBoard,
+      pattern,
+      remainingBoards: nextRemaingBoards,
+    });
+  }
+
+  public toString(): string {
+    if (this.validBoards === null) {
+      throw new Error("Pokle must be solved before");
+    }
+
+    const pokleSummary = `#Poklebot #${this.gameId} - ${this.validBoards.length} possible solutions`;
+
+    const patterns = this.guesses
+      .map(
+        (guess) =>
+          guess.pattern.join("") +
+          " - " +
+          guess.remainingBoards.length +
+          " remaining"
+      )
+      .join("\n");
+    const playedBoards = this.guesses
+      .map((guess) => guess.playedBoard.join(" "))
+      .join("\n");
+
+    return pokleSummary + "\n" + patterns + "\n\nGuesses:\n" + playedBoards;
   }
 }

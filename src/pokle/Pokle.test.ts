@@ -35,8 +35,9 @@ describe("Pokle", () => {
         },
       ];
 
-      const pokle = new Pokle(players);
-      expect(pokle.validCards.length).toBe(46);
+      const pokle = new Pokle(0, players);
+      pokle.getAllValidCards();
+      expect((pokle.validCards ?? []).length).toBe(46);
     });
   });
 
@@ -71,7 +72,7 @@ describe("Pokle", () => {
       },
     ];
 
-    const pokle = new Pokle(players);
+    const pokle = new Pokle(0, players);
 
     it("should be a valid flop", () => {
       expect(
@@ -190,7 +191,7 @@ describe("Pokle", () => {
         },
       ];
 
-      const pokle = new Pokle(players);
+      const pokle = new Pokle(0, players);
 
       const boards: BoardCards[] = [
         [
@@ -202,7 +203,9 @@ describe("Pokle", () => {
         ],
       ];
 
-      expect(pokle.keepOnlyValidBoards({ rivers: boards })).toEqual([]);
+      pokle.possibleRivers = boards;
+      pokle.keepOnlyValidBoards();
+      expect(pokle.remaingBoards).toEqual([]);
     });
 
     it("should keep the board", () => {
@@ -236,7 +239,7 @@ describe("Pokle", () => {
         },
       ];
 
-      const pokle = new Pokle(players);
+      const pokle = new Pokle(0, players);
 
       const boards: BoardCards[] = [
         [
@@ -248,7 +251,9 @@ describe("Pokle", () => {
         ],
       ];
 
-      expect(pokle.keepOnlyValidBoards({ rivers: boards })).toEqual(boards);
+      pokle.possibleRivers = boards;
+      pokle.keepOnlyValidBoards();
+      expect(pokle.remaingBoards).toEqual(boards);
     });
   });
 
@@ -403,6 +408,36 @@ describe("Pokle", () => {
     });
 
     describe("keep only board matching pattern", () => {
+      const players: Players = [
+        {
+          cards: [new Card("6", "♦"), new Card("3", "♣")],
+          name: "Cat",
+          positions: {
+            flop: 3,
+            turn: 3,
+            river: 2,
+          },
+        },
+        {
+          cards: [new Card("Q", "♥"), new Card("8", "♦")],
+          name: "Pat",
+          positions: {
+            flop: 2,
+            turn: 1,
+            river: 1,
+          },
+        },
+        {
+          cards: [new Card("7", "♣"), new Card("9", "♥")],
+          name: "Nat",
+          positions: {
+            flop: 1,
+            turn: 2,
+            river: 2,
+          },
+        },
+      ];
+
       it("should keep board", () => {
         const playedBoard: BoardCards = [
           new Card("2", "♠"),
@@ -421,9 +456,10 @@ describe("Pokle", () => {
           ],
         ];
         const pattern: BoardPattern = ["🟨", "🟨", "🟨", "🟩", "🟩"];
-        expect(
-          Pokle.keepOnlyBoardsMatchingPattern({ boards, playedBoard, pattern })
-        ).toEqual(boards);
+        const pokle = new Pokle(0, players);
+        pokle.validBoards = boards;
+        pokle.guessBoard({ playedBoard, pattern });
+        expect(pokle.remaingBoards).toEqual(boards);
       });
 
       it("should remove board", () => {
@@ -444,9 +480,10 @@ describe("Pokle", () => {
           ],
         ];
         const pattern: BoardPattern = ["⬜️", "🟨", "🟨", "🟩", "🟩"];
-        expect(
-          Pokle.keepOnlyBoardsMatchingPattern({ boards, playedBoard, pattern })
-        ).toEqual([]);
+        const pokle = new Pokle(0, players);
+        pokle.validBoards = boards;
+        pokle.guessBoard({ playedBoard, pattern });
+        expect(pokle.remaingBoards).toEqual([]);
       });
     });
   });
