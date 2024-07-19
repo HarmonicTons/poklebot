@@ -1,12 +1,7 @@
 import playwright from "playwright";
-import {
-  closeAllModals,
-  getPlayers,
-  inputCard,
-  submitGuess,
-} from "./playwright/utils";
-import { Pokle } from "./pokle/Pokle";
 import { getStandardRecommendation } from "./bot/standard";
+import { closeAllModals, getPlayers, submitGuess } from "./playwright/utils";
+import { Pokle } from "./pokle/Pokle";
 
 const main = async () => {
   console.log("Fetching today's Pokle...");

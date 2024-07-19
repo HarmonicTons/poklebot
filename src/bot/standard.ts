@@ -4,7 +4,7 @@ import {
 } from "../entropy/entropy";
 import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
-import { FlopPattern, Pokle } from "../pokle/Pokle";
+import { Pokle } from "../pokle/Pokle";
 
 export const getFlopsWithRecommendations = (pokle: Pokle) => {
   const cards = pokle.validCards;

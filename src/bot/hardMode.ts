@@ -1,5 +1,4 @@
 import { getChoicesWithRecommendations } from "../entropy/entropy";
-import { BoardCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 
 export const getBoardsWithRecommendations = (pokle: Pokle) => {
