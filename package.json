@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "ts-node src/index.ts",
-    "scrap": "ts-node src/playwright/getTodaysGame.ts"
+    "start": "ts-node src/index.ts"
   },
   "author": "",
   "license": "ISC",

@@ -1,7 +1,10 @@
-import { getChoicesWithRecommendations } from "../entropy/entropy";
+import {
+  ChoiceWithRecommendation,
+  getChoicesWithRecommendations,
+} from "../entropy/entropy";
 import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
-import { Pokle } from "../pokle/Pokle";
+import { FlopPattern, Pokle } from "../pokle/Pokle";
 
 export const getFlopsWithRecommendations = (pokle: Pokle) => {
   const cards = pokle.validCards;
@@ -83,6 +86,18 @@ export const boardIsValid = (board: BoardCards): boolean => {
   return true;
 };
 
+const getBoardCards = (
+  flopWithEntropy: ChoiceWithRecommendation<FlopCards, any>,
+  turnWithEntropy: ChoiceWithRecommendation<Card, any>,
+  riverWithEntropy: ChoiceWithRecommendation<Card, any>
+): BoardCards => {
+  return [
+    ...flopWithEntropy.choice,
+    turnWithEntropy.choice,
+    riverWithEntropy.choice,
+  ];
+};
+
 export const getStandardRecommendation = (pokle: Pokle) => {
   const flopsWithEntropy = getFlopsWithRecommendations(pokle).slice(0, 10);
   const turnsWithEntropy = getTurnsWithRecommendations(pokle).slice(0, 10);
@@ -92,6 +107,11 @@ export const getStandardRecommendation = (pokle: Pokle) => {
     flop: flopsWithEntropy[0],
     turn: turnsWithEntropy[0],
     river: riversWithEntropy[0],
+    boardCards: getBoardCards(
+      flopsWithEntropy[0],
+      turnsWithEntropy[0],
+      riversWithEntropy[0]
+    ),
   };
   const firstBoard = [
     ...firstRecommendation.flop.choice,
@@ -107,6 +127,11 @@ export const getStandardRecommendation = (pokle: Pokle) => {
     flop: flopsWithEntropy[0],
     turn: turnsWithEntropy[0],
     river: riversWithEntropy[0],
+    boardCards: getBoardCards(
+      flopsWithEntropy[0],
+      turnsWithEntropy[0],
+      riversWithEntropy[0]
+    ),
   };
 
   let bestBoardRecommendationIndex = 0;
@@ -126,6 +151,7 @@ export const getStandardRecommendation = (pokle: Pokle) => {
             flop,
             turn,
             river,
+            boardCards: getBoardCards(flop, turn, river),
           };
           bestBoardRecommendationIndex = boardRecommendationIndex;
         }

@@ -4,7 +4,7 @@ type OutcomesDistribution<O extends string | number> = Record<O, number>;
 type Entropy = number;
 type RecommendationIndex = number;
 
-type ChoiceWithRecommendation<C, O extends string | number> = {
+export type ChoiceWithRecommendation<C, O extends string | number> = {
   choice: C;
   outcomes: OutcomesDistribution<O>;
   entropy: Entropy;
