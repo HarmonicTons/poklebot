@@ -1,4 +1,4 @@
-import { getFlopRecommendation } from "./entropy";
+import { getFlopsWithRecommendations } from "./entropy";
 import { Card, CardHexArray, CardSuit, HexCardRank } from "./poker/Card";
 import { BoardCards } from "./poker/Poker";
 
@@ -71,7 +71,9 @@ describe("entropy", () => {
     ];
 
     expect(
-      getFlopRecommendation(boards, cards).flop.map((card) => card.toString())
+      getFlopsWithRecommendations(boards, cards)[0].choice.map((card) =>
+        card.toString()
+      )
     ).toMatchObject(["7♠", "7♦", "Q♠"]);
   });
 });

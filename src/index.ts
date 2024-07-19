@@ -58,9 +58,9 @@ const main = async () => {
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
-      ...recommendation.flop.flop,
-      recommendation.turn.card,
-      recommendation.river.card,
+      ...recommendation.flop.choice,
+      recommendation.turn.choice,
+      recommendation.river.choice,
     ])
   );
 
@@ -100,9 +100,9 @@ const main = async () => {
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
-      ...recommendation2.flop.flop,
-      recommendation2.turn.card,
-      recommendation2.river.card,
+      ...recommendation2.flop.choice,
+      recommendation2.turn.choice,
+      recommendation2.river.choice,
     ])
   );
 
@@ -144,9 +144,9 @@ const main = async () => {
   console.log(
     "standard-mode recommendation:",
     JSON.stringify([
-      ...recommendation3.flop.flop,
-      recommendation3.turn.card,
-      recommendation3.river.card,
+      ...recommendation3.flop.choice,
+      recommendation3.turn.choice,
+      recommendation3.river.choice,
     ])
   );
 
