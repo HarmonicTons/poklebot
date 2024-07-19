@@ -1,6 +1,11 @@
 import playwright from "playwright";
 import { getStandardRecommendation } from "./bot/standard";
-import { closeAllModals, getPlayers, submitGuess } from "./playwright/utils";
+import {
+  closeAllModals,
+  getPlayers,
+  submitGuess,
+  timeout,
+} from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
 import { getHardModeRecommendation } from "./bot/hardMode";
 
@@ -18,8 +23,7 @@ const main = async () => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
-  const statsPromise = page.waitForRequest("/stats_add.php");
-
+  console.log("Possible boards:", (pokle.remaingBoards ?? []).length);
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
     const nextGuess = playInHardMode
       ? getHardModeRecommendation(pokle).choice
@@ -46,11 +50,15 @@ const main = async () => {
       playedBoard: nextGuess,
       pattern: boardPattern,
     });
+
+    console.log("Remaining boards:", (pokle.remaingBoards ?? []).length);
   }
 
-  await page.screenshot({ path: "screen.png" });
+  await page.screenshot({ path: "victoryScreen.png" });
 
-  await statsPromise;
+  await timeout(3000);
+
+  await page.screenshot({ path: "statsScreen.png" });
 
   await browser.close();
 };

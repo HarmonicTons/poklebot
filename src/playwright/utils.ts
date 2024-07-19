@@ -188,7 +188,7 @@ export const readCardPattern = async (
 
 const submitBtnSelector = "#submit-button";
 
-const timeout = (n: number): Promise<void> =>
+export const timeout = (n: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, n));
 
 export const submitGuess = async (

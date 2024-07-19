@@ -1,6 +1,10 @@
 import { getChoicesWithRecommendations } from "../entropy/entropy";
 import { Pokle } from "../pokle/Pokle";
 
+/**
+ * In Hard Mode each guess must be a valid board for the game.
+ * ie. the board must respect the score of each player.
+ */
 export const getBoardsWithRecommendations = (pokle: Pokle) => {
   const boards = pokle.remaingBoards;
   if (boards === null) {
