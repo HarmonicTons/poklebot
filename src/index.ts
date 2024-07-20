@@ -11,6 +11,11 @@ import { getHardModeRecommendation } from "./bot/hardMode";
 import { getRandomRecommendation } from "./bot/random";
 
 type Mode = "random" | "hard-mode" | "standard";
+const modeLabel: Record<Mode, string> = {
+  random: "random mode 🙈",
+  "hard-mode": "hard mode 😤",
+  standard: "standard mode 🥱",
+};
 
 const main = async (mode: Mode) => {
   console.log("Fetching today's Pokle...");
@@ -24,7 +29,7 @@ const main = async (mode: Mode) => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
-  console.log(`Playing in: ${mode}`);
+  console.log(`Playing in ${modeLabel[mode]}`);
   console.log("Possible boards:", (pokle.remaingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
@@ -75,4 +80,4 @@ const main = async (mode: Mode) => {
   await browser.close();
 };
 
-main("random");
+main("hard-mode");
