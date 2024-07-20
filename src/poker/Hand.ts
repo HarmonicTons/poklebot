@@ -67,11 +67,18 @@ export class Hand {
 
     const isFlush = cardSuits.every((suit) => suit === cardSuits[0]);
 
-    const isStraight = cardHexRanks.every((rank, index) =>
-      index === 0
-        ? true
-        : parseInt(rank, 16) === parseInt(cardHexRanks[index - 1], 16) - 1
-    );
+    const isStraight = cardHexRanks.every((hexRank, index) => {
+      if (index === 0) {
+        return true;
+      }
+      // aces can be treated as 1 or A
+      if (hexRank === "5" && index === 1 && cardHexRanks[0] === "e") {
+        return true;
+      }
+      return (
+        parseInt(hexRank, 16) === parseInt(cardHexRanks[index - 1], 16) - 1
+      );
+    });
 
     // SF
     if (isFlush && isStraight) {
@@ -180,11 +187,19 @@ export class Hand {
   }
 
   public get hexScore(): HexHandScore {
-    return (
+    const score =
       this.hexRank +
       this.primaryCards.map((card) => card.hexRank).join("") +
-      this.kickers.map((card) => card.hexRank).join("")
-    );
+      this.kickers.map((card) => card.hexRank).join("");
+
+    // handle special case for straight where the ace is the lowest card
+    if (score === "4e5432") {
+      return "454321";
+    }
+    if (score === "8e5432") {
+      return "854321";
+    }
+    return score;
   }
 
   public static orderByScore(hands: Hand[]): Hand[] {

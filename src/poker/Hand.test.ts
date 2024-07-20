@@ -63,6 +63,30 @@ describe("Hand", () => {
       expect(hand.rank).toBe("ST");
     });
 
+    it("ST ace last", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("K", "♣"),
+        new Card("10", "♠"),
+        new Card("Q", "♥"),
+        new Card("J", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.rank).toBe("ST");
+    });
+
+    it("ST ace first", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("2", "♣"),
+        new Card("5", "♠"),
+        new Card("4", "♥"),
+        new Card("3", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.rank).toBe("ST");
+    });
+
     it("3K", () => {
       const handCards: HandCards = [
         new Card("7", "♠"),
@@ -125,6 +149,30 @@ describe("Hand", () => {
       expect(hand.hexScore).toBe("8ba987");
     });
 
+    it("SF ace first", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("2", "♠"),
+        new Card("4", "♠"),
+        new Card("3", "♠"),
+        new Card("5", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.hexScore).toBe("854321");
+    });
+
+    it("SF ace last", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("K", "♠"),
+        new Card("J", "♠"),
+        new Card("Q", "♠"),
+        new Card("10", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.hexScore).toBe("8edcba");
+    });
+
     it("4K", () => {
       const handCards: HandCards = [
         new Card("7", "♠"),
@@ -171,6 +219,30 @@ describe("Hand", () => {
       ];
       const hand = new Hand(handCards);
       expect(hand.hexScore).toBe("476543");
+    });
+
+    it("ST ace first", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("2", "♣"),
+        new Card("4", "♠"),
+        new Card("3", "♥"),
+        new Card("5", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.hexScore).toBe("454321");
+    });
+
+    it("ST ace last", () => {
+      const handCards: HandCards = [
+        new Card("A", "♠"),
+        new Card("K", "♣"),
+        new Card("J", "♠"),
+        new Card("Q", "♥"),
+        new Card("10", "♠"),
+      ];
+      const hand = new Hand(handCards);
+      expect(hand.hexScore).toBe("4edcba");
     });
 
     it("3K", () => {

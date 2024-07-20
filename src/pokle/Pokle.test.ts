@@ -1,4 +1,4 @@
-import { Card } from "../poker/Card";
+import { Card, CardString } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { BoardPattern, Players, Pokle } from "./Pokle";
 
@@ -248,6 +248,51 @@ describe("Pokle", () => {
           new Card("Q", "♠"),
           new Card("Q", "♦"),
           new Card("Q", "♣"),
+        ],
+      ];
+
+      pokle.possibleRivers = boards;
+      pokle.keepOnlyValidBoards();
+      expect(pokle.remaingBoards).toEqual(boards);
+    });
+
+    it("should keep the board (straight)", () => {
+      const players: Players = [
+        {
+          name: "Pam",
+          cards: ["4♥", "2♠"].map((c) => Card.fromString(c as CardString)) as [
+            Card,
+            Card
+          ],
+          positions: { flop: 1, turn: 1, river: 2 },
+        },
+        {
+          name: "Sam",
+          cards: ["9♦", "Q♠"].map((c) => Card.fromString(c as CardString)) as [
+            Card,
+            Card
+          ],
+          positions: { flop: 2, turn: 3, river: 3 },
+        },
+        {
+          name: "Lam",
+          cards: ["3♣", "A♣"].map((c) => Card.fromString(c as CardString)) as [
+            Card,
+            Card
+          ],
+          positions: { flop: 3, turn: 2, river: 1 },
+        },
+      ];
+
+      const pokle = new Pokle(0, players);
+
+      const boards: BoardCards[] = [
+        [
+          new Card("2", "♣"),
+          new Card("2", "♦"),
+          new Card("9", "♣"),
+          new Card("4", "♣"),
+          new Card("5", "♣"),
         ],
       ];
 

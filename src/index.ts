@@ -40,6 +40,7 @@ const main = async () => {
       guessNumber as 1 | 2 | 3 | 4 | 5 | 6
     );
 
+    await page.screenshot({ path: `guess${guessNumber}.png` });
     console.log("Result:", boardPattern.join(""));
 
     if (boardPattern.join("") === "🟩🟩🟩🟩🟩") {
