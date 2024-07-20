@@ -27,9 +27,7 @@ export const getFlopsWithRecommendations = (pokle: Pokle) => {
     possibleAnswers: boards,
     getOutcome: (flop, board) =>
       Pokle.getFlopPattern(flop, board.slice(0, 3) as FlopCards)
-        // flop order does not matter
-        .sort()
-        .join(""),
+      .join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
       return (outcomes["🟩🟩🟩"] ?? 0) / boards.length;
     },

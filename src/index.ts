@@ -8,10 +8,11 @@ import {
 } from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
 import { getHardModeRecommendation } from "./bot/hardMode";
+import { getRandomRecommendation } from "./bot/random";
 
-const playInHardMode = true;
+type Mode = "random" | "hard-mode" | "standard";
 
-const main = async () => {
+const main = async (mode: Mode) => {
   console.log("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -23,15 +24,20 @@ const main = async () => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
-  console.log(
-    `Playing in ${playInHardMode ? "hard-mode 😤" : "standard-mode 🥱"}`
-  );
+  console.log(`Playing in: ${mode}`);
   console.log("Possible boards:", (pokle.remaingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    const nextGuess = playInHardMode
-      ? getHardModeRecommendation(pokle).choice
-      : getStandardRecommendation(pokle).boardCards;
+    const nextGuess = (() => {
+      switch (mode) {
+        case "random":
+          return getRandomRecommendation(pokle);
+        case "hard-mode":
+          return getHardModeRecommendation(pokle).choice;
+        case "standard":
+          return getStandardRecommendation(pokle).boardCards;
+      }
+    })();
 
     console.log(
       "Playing:",
@@ -69,4 +75,4 @@ const main = async () => {
   await browser.close();
 };
 
-main();
+main("random");

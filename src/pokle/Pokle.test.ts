@@ -507,6 +507,30 @@ describe("Pokle", () => {
         expect(pokle.remaingBoards).toEqual(boards);
       });
 
+      it("should keep board (random fail)", () => {
+        const playedBoard: BoardCards = [
+          new Card("2", "♦"),
+          new Card("4", "♣"),
+          new Card("Q", "♦"),
+          new Card("A", "♥"),
+          new Card("5", "♣"),
+        ];
+        const boards: BoardCards[] = [
+          [
+            new Card("2", "♣"),
+            new Card("2", "♦"),
+            new Card("9", "♣"),
+            new Card("4", "♣"),
+            new Card("5", "♣"),
+          ],
+        ];
+        const pattern: BoardPattern = ["🟩", "🟨", "⬜️", "⬜️", "🟩"];
+        const pokle = new Pokle(0, players);
+        pokle.validBoards = boards;
+        pokle.guessBoard({ playedBoard, pattern });
+        expect(pokle.remaingBoards).toEqual(boards);
+      });
+
       it("should remove board", () => {
         const playedBoard: BoardCards = [
           new Card("2", "♠"),
