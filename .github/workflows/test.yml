@@ -1,0 +1,15 @@
+---
+name: Run test
+
+on: workflow_call
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: NPM CI Install
+        run: npm ci
+
+      - name: Test
+        run: npm run test
+        timeout-minutes: 15
