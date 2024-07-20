@@ -9,7 +9,7 @@ import {
 import { Pokle } from "./pokle/Pokle";
 import { getHardModeRecommendation } from "./bot/hardMode";
 
-const playInHardMode = false;
+const playInHardMode = true;
 
 const main = async () => {
   console.log("Fetching today's Pokle...");
@@ -23,7 +23,11 @@ const main = async () => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
+  console.log(
+    `Playing in ${playInHardMode ? "hard-mode 😤" : "standard-mode 🥱"}`
+  );
   console.log("Possible boards:", (pokle.remaingBoards ?? []).length);
+
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
     const nextGuess = playInHardMode
       ? getHardModeRecommendation(pokle).choice
@@ -40,12 +44,13 @@ const main = async () => {
       guessNumber as 1 | 2 | 3 | 4 | 5 | 6
     );
 
-    await page.screenshot({ path: `guess${guessNumber}.png` });
     console.log("Result:", boardPattern.join(""));
 
     if (boardPattern.join("") === "🟩🟩🟩🟩🟩") {
       break;
     }
+
+    await page.screenshot({ path: `screenshots/guess${guessNumber}.png` });
 
     pokle.guessBoard({
       playedBoard: nextGuess,
@@ -55,11 +60,11 @@ const main = async () => {
     console.log("Remaining boards:", (pokle.remaingBoards ?? []).length);
   }
 
-  await page.screenshot({ path: "victoryScreen.png" });
+  await page.screenshot({ path: "screenshots/victoryScreen.png" });
 
   await timeout(3000);
 
-  await page.screenshot({ path: "statsScreen.png" });
+  await page.screenshot({ path: "screenshots/statsScreen.png" });
 
   await browser.close();
 };
