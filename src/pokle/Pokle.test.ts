@@ -400,6 +400,34 @@ describe("Pokle", () => {
         ];
         expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟨", "⬜️"]);
       });
+
+      it("should return 🟩🟨⬜️ whith same suit in 🟩 and ⬜️", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♣"),
+          new Card("5", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♦"),
+          new Card("4", "♦"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟨", "⬜️"]);
+      });
+
+      it("should return 🟩🟨⬜️ whith same suit in 🟩 and ⬜️ in different places", () => {
+        const flop1: FlopCards = [
+          new Card("2", "♠"),
+          new Card("3", "♣"),
+          new Card("5", "♠"),
+        ];
+        const flop2: FlopCards = [
+          new Card("3", "♦"),
+          new Card("2", "♠"),
+          new Card("4", "♦"),
+        ];
+        expect(Pokle.getFlopPattern(flop1, flop2)).toEqual(["🟩", "🟨", "⬜️"]);
+      });
     });
 
     describe("board pattern", () => {
@@ -427,7 +455,7 @@ describe("Pokle", () => {
         ]);
       });
 
-      it("should return 🟩🟨⬜️🟨⬜️", () => {
+      it("should return 🟩⬜️⬜️🟨⬜️", () => {
         const board1: BoardCards = [
           new Card("2", "♠"),
           new Card("3", "♠"),
@@ -444,7 +472,7 @@ describe("Pokle", () => {
         ];
         expect(Pokle.getBoardPattern(board1, board2)).toEqual([
           "🟩",
-          "🟨",
+          "⬜️",
           "⬜️",
           "🟨",
           "⬜️",

@@ -295,7 +295,7 @@ export class Pokle {
 
   public static getFlopCardPattern(
     card: Card,
-    actualFlop: FlopCards
+    actualFlop: Card[]
   ): CardPattern {
     const patterns = actualFlop.map((flopCard) =>
       Pokle.getCardPattern(card, flopCard)
@@ -313,10 +313,36 @@ export class Pokle {
     playedFlop: FlopCards,
     actualFlop: FlopCards
   ): FlopPattern {
-    const pattern = playedFlop.map((card) =>
-      Pokle.getFlopCardPattern(card, actualFlop)
+    const pattern: FlopPattern = ["⬜️", "⬜️", "⬜️"];
+
+    const greenCards: Card[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      const playedCard = playedFlop[i];
+      const cardPattern = this.getFlopCardPattern(playedCard, actualFlop);
+      if (cardPattern === "🟩") {
+        pattern[i] = "🟩";
+        greenCards.push(playedCard);
+      }
+    }
+    // once a card has been greened-out its rank or suit cannot
+    // make another card yellow
+    const actualFlopWithoutGreenCards = actualFlop.filter((c) =>
+      greenCards.every((gc) => !gc.isEqual(c))
     );
-    return pattern as FlopPattern;
+    for (let i = 0; i < 3; i++) {
+      if (pattern[i] === "🟩") {
+        continue;
+      }
+      const playedCard = playedFlop[i];
+      const cardPattern = this.getFlopCardPattern(
+        playedCard,
+        actualFlopWithoutGreenCards
+      );
+      pattern[i] = cardPattern;
+    }
+
+    return pattern;
   }
 
   public static getBoardPattern = (
