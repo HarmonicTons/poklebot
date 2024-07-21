@@ -15,6 +15,7 @@ import {
 } from "./bot/hardMode";
 import { Recommendation } from "./bot/Recommendation";
 import { Greediness } from "./entropy/entropy";
+import { DateTime } from "luxon";
 
 type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze" | "greedy";
 const modeLabel: Record<Mode, string> = {
@@ -34,7 +35,8 @@ const main = async (mode: Mode, greediness?: Greediness) => {
   await closeAllModals(page);
   const players = await getPlayers(page);
 
-  const pokle = new Pokle(0, players);
+  const gameId = Pokle.getGameIdFromDate(DateTime.now());
+  const pokle = new Pokle(gameId, players);
   pokle.solve();
 
   console.info(`Playing in ${modeLabel[mode]}`);
@@ -98,4 +100,4 @@ const main = async (mode: Mode, greediness?: Greediness) => {
   console.info(pokle.toString());
 };
 
-main("greedy");
+main("kamikaze");

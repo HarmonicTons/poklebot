@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Card, CARD_RANKS, CARD_SUITS } from "../poker/Card";
 import { Hand } from "../poker/Hand";
 import {
@@ -281,6 +282,13 @@ export class Pokle {
     this.keepOnlyValidBoards();
     console.debug(`${this.validBoards?.length} valid boards`);
     this.isSolved = true;
+  }
+
+  public static getGameIdFromDate(date: DateTime): number {
+    const pokleStartDateTimestamp = 1656972000000;
+    const pokleStartDate = DateTime.fromMillis(pokleStartDateTimestamp);
+    const diff = date.diff(pokleStartDate, "days").days;
+    return Math.floor(diff);
   }
 
   public static getCardPattern(
