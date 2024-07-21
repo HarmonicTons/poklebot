@@ -81,5 +81,3 @@ const main = async (mode: Mode) => {
 };
 
 main("unrestricted");
-
-// renaim unrestricted + fix duplicated card
