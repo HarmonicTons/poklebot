@@ -185,5 +185,9 @@ export const getUnrestrictedRecommendation = (
     }
   }
 
+  if (bestBoardRecommendationIndex === 0) {
+    throw new Error("Could not find a valid board");
+  }
+
   return bestRecommendation;
 };
