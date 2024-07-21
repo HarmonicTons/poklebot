@@ -82,6 +82,12 @@ export class Card {
     return hexCardRankRecord[this.rank];
   }
 
+  public static getAllCards(): Card[] {
+    return CARD_RANKS.flatMap((rank) =>
+      CARD_SUITS.map((suit) => new Card(rank, suit))
+    );
+  }
+
   public static orderByRank(cards: Card[]): Card[] {
     return orderBy(cards, "hexRank", "desc");
   }

@@ -19,7 +19,7 @@ export type Player = {
 
 export type Players = [Player, Player, Player];
 
-const CARD_PATTERNS = ["🟩", "🟨", "⬜️"] as const;
+const CARD_PATTERNS = ["🟩", "🟦", "🟨", "⬜️"] as const;
 export type CardPattern = (typeof CARD_PATTERNS)[number];
 
 export type FlopPattern = [CardPattern, CardPattern, CardPattern];
@@ -53,7 +53,7 @@ export class Pokle {
     public readonly players: Players
   ) {}
 
-  public get remaingBoards() {
+  public get remainingBoards() {
     return this.guesses.length === 0
       ? this.validBoards
       : this.guesses[this.guesses.length - 1].remainingBoards;
@@ -283,9 +283,16 @@ export class Pokle {
     this.isSolved = true;
   }
 
-  public static getCardPattern(card1: Card, card2: Card): CardPattern {
+  public static getCardPattern(
+    card1: Card,
+    card2: Card,
+    autocorrect: boolean = false
+  ): CardPattern {
     if (card1.isEqual(card2)) {
       return "🟩";
+    }
+    if (autocorrect && card1.rank === card2.rank) {
+      return "🟦";
     }
     if (card1.rank === card2.rank || card1.suit === card2.suit) {
       return "🟨";
@@ -353,8 +360,18 @@ export class Pokle {
       playedBoard.slice(0, 3) as FlopCards,
       actualBoard.slice(0, 3) as FlopCards
     );
-    const turnPattern = Pokle.getCardPattern(playedBoard[3], actualBoard[3]);
-    const riverPattern = Pokle.getCardPattern(playedBoard[4], actualBoard[4]);
+    // if the flop is correct, the turn and river card color does not matter anymore
+    const autocorrect = flopPattern.join("") === "🟩🟩🟩";
+    const turnPattern = Pokle.getCardPattern(
+      playedBoard[3],
+      actualBoard[3],
+      autocorrect
+    );
+    const riverPattern = Pokle.getCardPattern(
+      playedBoard[4],
+      actualBoard[4],
+      autocorrect
+    );
     return [...flopPattern, turnPattern, riverPattern] as BoardPattern;
   };
 
@@ -387,11 +404,11 @@ export class Pokle {
     playedBoard: BoardCards;
     pattern: BoardPattern;
   }): void {
-    if (this.remaingBoards === null) {
+    if (this.remainingBoards === null) {
       throw new Error("Pokle must be solved before");
     }
 
-    const nextRemaingBoards = this.remaingBoards.filter((board) => {
+    const nextRemaingBoards = this.remainingBoards.filter((board) => {
       const flopPattern = Pokle.getFlopPattern(
         playedBoard.slice(0, 3) as FlopCards,
         board.slice(0, 3) as FlopCards

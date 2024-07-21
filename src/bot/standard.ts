@@ -6,9 +6,11 @@ import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 
-export const getFlopsWithRecommendations = (pokle: Pokle) => {
+export const getFlopsWithRecommendations = (
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+) => {
   const cards = pokle.validCards;
-  const boards = pokle.remaingBoards;
+  const boards = pokle.remainingBoards;
   if (cards === null || boards === null) {
     throw new Error("Pokle must be solved first");
   }
@@ -26,44 +28,59 @@ export const getFlopsWithRecommendations = (pokle: Pokle) => {
     choices: flops,
     possibleAnswers: boards,
     getOutcome: (flop, board) =>
-      Pokle.getFlopPattern(flop, board.slice(0, 3) as FlopCards)
-      .join(""),
+      Pokle.getFlopPattern(flop, board.slice(0, 3) as FlopCards).join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
       return (outcomes["🟩🟩🟩"] ?? 0) / boards.length;
     },
   });
 };
 
-export const getTurnsWithRecommendations = (pokle: Pokle) => {
+export const getTurnsWithRecommendations = (
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+) => {
   const cards = pokle.validCards;
-  const boards = pokle.remaingBoards;
+  const boards = pokle.remainingBoards;
   if (cards === null || boards === null) {
     throw new Error("Pokle must be solved first");
   }
+
+  // TODO: not sure about this, since in unrestricted mode we look for the flop
+  // independently of the turn and river
+  const autocorrect = true;
 
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
     getOutcome: (card, board) => Pokle.getCardPattern(card, board[3]),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return (outcomes["🟩"] ?? 0) / boards.length;
+      const probabilityOfBeingAnswer =
+        ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
+      return probabilityOfBeingAnswer;
     },
   });
 };
 
-export const getRiversWithRecommendations = (pokle: Pokle) => {
+export const getRiversWithRecommendations = (
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+) => {
   const cards = pokle.validCards;
-  const boards = pokle.remaingBoards;
+  const boards = pokle.remainingBoards;
   if (cards === null || boards === null) {
     throw new Error("Pokle must be solved first");
   }
+
+  // TODO: not sure about this, since in unrestricted mode we look for the flop
+  // independently of the turn and river
+  const autocorrect = true;
 
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
     getOutcome: (card, board) => Pokle.getCardPattern(card, board[4]),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return (outcomes["🟩"] ?? 0) / boards.length;
+      const probabilityOfBeingAnswer =
+        ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
+      return probabilityOfBeingAnswer;
     },
   });
 };
@@ -96,19 +113,30 @@ const getBoardCards = (
   ];
 };
 
-export const getStandardRecommendation = (pokle: Pokle) => {
-  const flopsWithEntropy = getFlopsWithRecommendations(pokle).slice(0, 10);
-  const turnsWithEntropy = getTurnsWithRecommendations(pokle).slice(0, 10);
-  const riversWithEntropy = getRiversWithRecommendations(pokle).slice(0, 10);
+export const getStandardRecommendation = (
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+) => {
+  const flopsWithRecommendation = getFlopsWithRecommendations(pokle).slice(
+    0,
+    10
+  );
+  const turnsWithRecommendation = getTurnsWithRecommendations(pokle).slice(
+    0,
+    10
+  );
+  const riversWithRecommendation = getRiversWithRecommendations(pokle).slice(
+    0,
+    10
+  );
 
   const firstRecommendation = {
-    flop: flopsWithEntropy[0],
-    turn: turnsWithEntropy[0],
-    river: riversWithEntropy[0],
+    flop: flopsWithRecommendation[0],
+    turn: turnsWithRecommendation[0],
+    river: riversWithRecommendation[0],
     boardCards: getBoardCards(
-      flopsWithEntropy[0],
-      turnsWithEntropy[0],
-      riversWithEntropy[0]
+      flopsWithRecommendation[0],
+      turnsWithRecommendation[0],
+      riversWithRecommendation[0]
     ),
   };
   const firstBoard = [
@@ -122,20 +150,20 @@ export const getStandardRecommendation = (pokle: Pokle) => {
 
   // look for the valid board with the highest recommendation index
   let bestRecommendation = {
-    flop: flopsWithEntropy[0],
-    turn: turnsWithEntropy[0],
-    river: riversWithEntropy[0],
+    flop: flopsWithRecommendation[0],
+    turn: turnsWithRecommendation[0],
+    river: riversWithRecommendation[0],
     boardCards: getBoardCards(
-      flopsWithEntropy[0],
-      turnsWithEntropy[0],
-      riversWithEntropy[0]
+      flopsWithRecommendation[0],
+      turnsWithRecommendation[0],
+      riversWithRecommendation[0]
     ),
   };
 
   let bestBoardRecommendationIndex = 0;
-  for (const flop of flopsWithEntropy) {
-    for (const turn of turnsWithEntropy) {
-      for (const river of riversWithEntropy) {
+  for (const flop of flopsWithRecommendation) {
+    for (const turn of turnsWithRecommendation) {
+      for (const river of riversWithRecommendation) {
         const board = [...flop.choice, turn.choice, river.choice] as BoardCards;
         const boardRecommendationIndex =
           flop.recommendationIndex +

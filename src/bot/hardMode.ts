@@ -6,7 +6,7 @@ import { Pokle } from "../pokle/Pokle";
  * ie. the board must respect the score of each player.
  */
 export const getBoardsWithRecommendations = (pokle: Pokle) => {
-  const boards = pokle.remaingBoards;
+  const boards = pokle.remainingBoards;
   if (boards === null) {
     throw new Error("Pokle must be solved first");
   }
@@ -17,7 +17,12 @@ export const getBoardsWithRecommendations = (pokle: Pokle) => {
     getOutcome: (board1, board2) =>
       Pokle.getBoardPattern(board1, board2).join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
+      const solution = outcomes["🟩🟩🟩🟩🟩"] ?? 0;
+      const solutionsWithAutocorrect =
+        (outcomes["🟩🟩🟩🟦🟩"] ?? 0) +
+        (outcomes["🟩🟩🟩🟩🟦"] ?? 0) +
+        (outcomes["🟩🟩🟩🟦🟦"] ?? 0);
+      return (solution + solutionsWithAutocorrect) / boards.length;
     },
   });
 };

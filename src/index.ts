@@ -18,7 +18,7 @@ const modeLabel: Record<Mode, string> = {
 };
 
 const main = async (mode: Mode) => {
-  console.log("Fetching today's Pokle...");
+  console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -29,8 +29,8 @@ const main = async (mode: Mode) => {
   const pokle = new Pokle(0, players);
   pokle.solve();
 
-  console.log(`Playing in ${modeLabel[mode]}`);
-  console.log("Possible boards:", (pokle.remaingBoards ?? []).length);
+  console.info(`Playing in ${modeLabel[mode]}`);
+  console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
     const nextGuess = (() => {
@@ -44,7 +44,7 @@ const main = async (mode: Mode) => {
       }
     })();
 
-    console.log(
+    console.info(
       "Playing:",
       nextGuess.map((card) => card.toString())
     );
@@ -55,7 +55,7 @@ const main = async (mode: Mode) => {
       guessNumber as 1 | 2 | 3 | 4 | 5 | 6
     );
 
-    console.log("Result:", boardPattern.join(""));
+    console.info("Result:", boardPattern.join(""));
 
     if (boardPattern.join("") === "🟩🟩🟩🟩🟩") {
       break;
@@ -68,7 +68,7 @@ const main = async (mode: Mode) => {
       pattern: boardPattern,
     });
 
-    console.log("Remaining boards:", (pokle.remaingBoards ?? []).length);
+    console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
   }
 
   await page.screenshot({ path: "screenshots/victoryScreen.png" });
@@ -81,3 +81,5 @@ const main = async (mode: Mode) => {
 };
 
 main("standard");
+
+// renaim unrestricted + fix duplicated card
