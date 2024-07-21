@@ -416,11 +416,15 @@ export class Pokle {
       if (flopPattern.join("") !== pattern.slice(0, 3).join("")) {
         return false;
       }
-      const turnOutcome = Pokle.getCardPattern(playedBoard[3], board[3]);
+      const turnOutcome = Pokle.getCardPattern(playedBoard[3], board[3], false);
       if (turnOutcome !== pattern[3]) {
         return false;
       }
-      const riverOutcome = Pokle.getCardPattern(playedBoard[4], board[4]);
+      const riverOutcome = Pokle.getCardPattern(
+        playedBoard[4],
+        board[4],
+        false
+      );
       if (riverOutcome !== pattern[4]) {
         return false;
       }

@@ -31,3 +31,11 @@ export const getHardModeRecommendation = (pokle: Pokle) => {
   const boardsWithEntropy = getBoardsWithRecommendations(pokle);
   return boardsWithEntropy[0];
 };
+
+/**
+ * Kamikaze mode will always return the worst option.
+ */
+export const getKamikazeRecommendation = (pokle: Pokle) => {
+  const boardsWithEntropy = getBoardsWithRecommendations(pokle);
+  return boardsWithEntropy[boardsWithEntropy.length - 1];
+};

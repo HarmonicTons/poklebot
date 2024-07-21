@@ -7,14 +7,18 @@ import {
   timeout,
 } from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
-import { getHardModeRecommendation } from "./bot/hardMode";
+import {
+  getHardModeRecommendation,
+  getKamikazeRecommendation,
+} from "./bot/hardMode";
 import { getRandomRecommendation } from "./bot/random";
 
-type Mode = "random" | "hard-mode" | "unrestricted";
+type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze";
 const modeLabel: Record<Mode, string> = {
   random: "random mode 🙈",
   "hard-mode": "hard mode 😤",
   unrestricted: "unrestricted mode 🕵️‍♂️",
+  kamikaze: "kamikaze mode 💣",
 };
 
 const main = async (mode: Mode) => {
@@ -41,6 +45,8 @@ const main = async (mode: Mode) => {
           return getHardModeRecommendation(pokle).choice;
         case "unrestricted":
           return getUnrestrictedRecommendation(pokle).boardCards;
+        case "kamikaze":
+          return getKamikazeRecommendation(pokle).choice;
       }
     })();
 
@@ -80,4 +86,4 @@ const main = async (mode: Mode) => {
   await browser.close();
 };
 
-main("unrestricted");
+main("kamikaze");
