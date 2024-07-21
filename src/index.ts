@@ -10,8 +10,9 @@ import { Pokle } from "./pokle/Pokle";
 import {
   getHardModeRecommendation,
   getKamikazeRecommendation,
+  getRandomRecommendation,
 } from "./bot/hardMode";
-import { getRandomRecommendation } from "./bot/random";
+import { Recommendation } from "./bot/Recommendation";
 
 type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze";
 const modeLabel: Record<Mode, string> = {
@@ -37,27 +38,30 @@ const main = async (mode: Mode) => {
   console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    const nextGuess = (() => {
+    const nextGuess: Recommendation = (() => {
       switch (mode) {
         case "random":
           return getRandomRecommendation(pokle);
         case "hard-mode":
-          return getHardModeRecommendation(pokle).choice;
+          return getHardModeRecommendation(pokle);
         case "unrestricted":
-          return getUnrestrictedRecommendation(pokle).boardCards;
+          return getUnrestrictedRecommendation(pokle);
         case "kamikaze":
-          return getKamikazeRecommendation(pokle).choice;
+          return getKamikazeRecommendation(pokle);
       }
     })();
 
     console.info(
-      "Playing:",
-      nextGuess.map((card) => card.toString())
+      `Playing: ${JSON.stringify(
+        nextGuess.choice.map((card) => card.toString())
+      )} - E: ${nextGuess.entropy.toFixed(
+        4
+      )} - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
     );
 
     const boardPattern = await submitGuess(
       page,
-      nextGuess,
+      nextGuess.choice,
       guessNumber as 1 | 2 | 3 | 4 | 5 | 6
     );
 
@@ -70,7 +74,7 @@ const main = async (mode: Mode) => {
     await page.screenshot({ path: `screenshots/guess${guessNumber}.png` });
 
     pokle.guessBoard({
-      playedBoard: nextGuess,
+      playedBoard: nextGuess.choice,
       pattern: boardPattern,
     });
 
@@ -84,6 +88,9 @@ const main = async (mode: Mode) => {
   await page.screenshot({ path: "screenshots/statsScreen.png" });
 
   await browser.close();
+
+  console.info("-------");
+  console.info(pokle.toString());
 };
 
-main("kamikaze");
+main("hard-mode");

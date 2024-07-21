@@ -1,5 +1,6 @@
 import { getChoicesWithRecommendations } from "../entropy/entropy";
 import { Pokle } from "../pokle/Pokle";
+import { Recommendation } from "./Recommendation";
 
 /**
  * In Hard Mode each guess must be a valid board for the game.
@@ -27,15 +28,28 @@ export const getBoardsWithRecommendations = (pokle: Pokle) => {
   });
 };
 
-export const getHardModeRecommendation = (pokle: Pokle) => {
+/**
+ * Hard mode will return the best valid board
+ */
+export const getHardModeRecommendation = (pokle: Pokle): Recommendation => {
   const boardsWithEntropy = getBoardsWithRecommendations(pokle);
   return boardsWithEntropy[0];
 };
 
 /**
+ * Random mode will return a random board from the remaining boards.
+ */
+export const getRandomRecommendation = (pokle: Pokle): Recommendation => {
+  const boardsWithEntropy = getBoardsWithRecommendations(pokle);
+  return boardsWithEntropy[
+    Math.floor(Math.random() * boardsWithEntropy.length)
+  ];
+};
+
+/**
  * Kamikaze mode will always return the worst option.
  */
-export const getKamikazeRecommendation = (pokle: Pokle) => {
+export const getKamikazeRecommendation = (pokle: Pokle): Recommendation => {
   const boardsWithEntropy = getBoardsWithRecommendations(pokle);
   return boardsWithEntropy[boardsWithEntropy.length - 1];
 };

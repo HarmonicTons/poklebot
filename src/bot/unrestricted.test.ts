@@ -79,7 +79,7 @@ describe("unrestricted bot", () => {
       getUnrestrictedRecommendation({
         validCards,
         remainingBoards: boards,
-      }).boardCards.map((card) => card.toString())
+      }).choice.map((card) => card.toString())
     ).toMatchObject(["2♣", "3♠", "3♥", "3♦", "7♣"]);
   });
 });

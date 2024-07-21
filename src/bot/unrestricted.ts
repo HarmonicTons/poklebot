@@ -1,3 +1,4 @@
+import { sum, sumBy } from "lodash";
 import {
   ChoiceWithRecommendation,
   getChoicesWithRecommendations,
@@ -5,6 +6,7 @@ import {
 import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
+import { Recommendation } from "./Recommendation";
 
 export const getFlopsWithRecommendations = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">
@@ -113,9 +115,41 @@ const getBoardCards = (
   ];
 };
 
+export const mergeRecommendations = (
+  flopsWithRecommendation: ChoiceWithRecommendation<FlopCards, string>,
+  turnsWithRecommendation: ChoiceWithRecommendation<Card, string>,
+  riversWithRecommendation: ChoiceWithRecommendation<Card, string>
+): Recommendation => {
+  const entropy = sumBy([
+    flopsWithRecommendation,
+    turnsWithRecommendation,
+    riversWithRecommendation,
+  ]);
+  const probabilityOfBeingAnswer =
+    flopsWithRecommendation.probabilityOfBeingAnswer *
+    turnsWithRecommendation.probabilityOfBeingAnswer *
+    riversWithRecommendation.probabilityOfBeingAnswer;
+
+  const recommendationIndex = entropy + probabilityOfBeingAnswer;
+
+  const choice = [
+    ...flopsWithRecommendation.choice,
+    turnsWithRecommendation.choice,
+    riversWithRecommendation.choice,
+  ] as BoardCards;
+
+  return {
+    choice,
+    entropy,
+    outcomes: {},
+    probabilityOfBeingAnswer,
+    recommendationIndex,
+  };
+};
+
 export const getUnrestrictedRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">
-) => {
+): Recommendation => {
   const flopsWithRecommendation = getFlopsWithRecommendations(pokle).slice(
     0,
     10
@@ -129,63 +163,35 @@ export const getUnrestrictedRecommendation = (
     10
   );
 
-  const firstRecommendation = {
-    flop: flopsWithRecommendation[0],
-    turn: turnsWithRecommendation[0],
-    river: riversWithRecommendation[0],
-    boardCards: getBoardCards(
-      flopsWithRecommendation[0],
-      turnsWithRecommendation[0],
-      riversWithRecommendation[0]
-    ),
-  };
-  const firstBoard = [
-    ...firstRecommendation.flop.choice,
-    firstRecommendation.turn.choice,
-    firstRecommendation.river.choice,
-  ] as BoardCards;
-  if (boardIsValid(firstBoard)) {
+  const firstRecommendation = mergeRecommendations(
+    flopsWithRecommendation[0],
+    turnsWithRecommendation[0],
+    riversWithRecommendation[0]
+  );
+
+  if (boardIsValid(firstRecommendation.choice)) {
     return firstRecommendation;
   }
 
   // look for the valid board with the highest recommendation index
-  let bestRecommendation = {
-    flop: flopsWithRecommendation[0],
-    turn: turnsWithRecommendation[0],
-    river: riversWithRecommendation[0],
-    boardCards: getBoardCards(
-      flopsWithRecommendation[0],
-      turnsWithRecommendation[0],
-      riversWithRecommendation[0]
-    ),
-  };
-
-  let bestBoardRecommendationIndex = 0;
+  let bestRecommendation: Recommendation | undefined = undefined;
   for (const flop of flopsWithRecommendation) {
     for (const turn of turnsWithRecommendation) {
       for (const river of riversWithRecommendation) {
-        const board = [...flop.choice, turn.choice, river.choice] as BoardCards;
-        const boardRecommendationIndex =
-          flop.recommendationIndex +
-          turn.recommendationIndex +
-          river.recommendationIndex;
+        const recommendation = mergeRecommendations(flop, turn, river);
         if (
-          boardIsValid(board) &&
-          boardRecommendationIndex > bestBoardRecommendationIndex
+          boardIsValid(recommendation.choice) &&
+          (bestRecommendation === undefined ||
+            recommendation.recommendationIndex >
+              bestRecommendation.recommendationIndex)
         ) {
-          bestRecommendation = {
-            flop,
-            turn,
-            river,
-            boardCards: getBoardCards(flop, turn, river),
-          };
-          bestBoardRecommendationIndex = boardRecommendationIndex;
+          bestRecommendation = recommendation;
         }
       }
     }
   }
 
-  if (bestBoardRecommendationIndex === 0) {
+  if (bestRecommendation === undefined) {
     throw new Error("Could not find a valid board");
   }
 
