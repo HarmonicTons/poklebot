@@ -80,4 +80,4 @@ const main = async (mode: Mode) => {
   await browser.close();
 };
 
-main("hard-mode");
+main("standard");
