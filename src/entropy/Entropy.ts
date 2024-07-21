@@ -4,6 +4,9 @@ type OutcomesDistribution<O extends string | number> = Record<O, number>;
 type Entropy = number;
 type RecommendationIndex = number;
 
+// value from 0 to 1, 1: will always choose the most probable answer, 0: will always choose the most entropic answer
+export type Greediness = number;
+
 export type ChoiceWithRecommendation<C, O extends string | number> = {
   choice: C;
   outcomes: OutcomesDistribution<O>;
@@ -79,11 +82,14 @@ export const getEntropy = <O extends string | number>({
 export const getRecommendationIndex = ({
   entropy,
   probabilityOfBeingAnswer,
+  greediness,
 }: {
   entropy: number;
   probabilityOfBeingAnswer: number;
+  // value from 0 to 1, 1: will always choose the most probable answer, 0: will always choose the most entropic answer
+  greediness: Greediness;
 }): number => {
-  return entropy + probabilityOfBeingAnswer;
+  return entropy * (1 - greediness) + probabilityOfBeingAnswer * greediness;
 };
 
 /**
@@ -94,6 +100,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   possibleAnswers,
   getOutcome,
   getProbabilityOfBeingAnswer,
+  greediness,
 }: {
   // all possible choices
   choices: C[];
@@ -101,6 +108,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   possibleAnswers: P[];
   getOutcome: GetOutcome<C, P, O>;
   getProbabilityOfBeingAnswer: GetProbabilityOfBeingAnswer<O>;
+  greediness: Greediness;
 }): ChoiceWithRecommendation<C, O>[] => {
   const choicesWithRecommendations = choices.map((choice) => {
     const outcomes = getAllPossibleOutcomes({
@@ -113,6 +121,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
     const recommendationIndex = getRecommendationIndex({
       entropy,
       probabilityOfBeingAnswer,
+      greediness,
     });
 
     return {

@@ -25,10 +25,13 @@ describe("unrestricted bot", () => {
     ];
 
     expect(
-      getFlopsWithRecommendations({
-        validCards,
-        remainingBoards: boards,
-      })[0].choice.map((card) => card.toString())
+      getFlopsWithRecommendations(
+        {
+          validCards,
+          remainingBoards: boards,
+        },
+        0.5
+      )[0].choice.map((card) => card.toString())
     ).toMatchObject(["7♠", "7♦", "Q♠"]);
   });
 
@@ -76,10 +79,13 @@ describe("unrestricted bot", () => {
     );
 
     expect(
-      getUnrestrictedRecommendation({
-        validCards,
-        remainingBoards: boards,
-      }).choice.map((card) => card.toString())
+      getUnrestrictedRecommendation(
+        {
+          validCards,
+          remainingBoards: boards,
+        },
+        0.5
+      ).choice.map((card) => card.toString())
     ).toMatchObject(["2♣", "3♠", "3♥", "3♦", "7♣"]);
   });
 });

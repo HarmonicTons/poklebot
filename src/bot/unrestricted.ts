@@ -2,6 +2,8 @@ import { sum, sumBy } from "lodash";
 import {
   ChoiceWithRecommendation,
   getChoicesWithRecommendations,
+  getRecommendationIndex,
+  Greediness,
 } from "../entropy/entropy";
 import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
@@ -9,7 +11,8 @@ import { Pokle } from "../pokle/Pokle";
 import { Recommendation } from "./Recommendation";
 
 export const getFlopsWithRecommendations = (
-  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">,
+  greediness: Greediness
 ) => {
   const cards = pokle.validCards;
   const boards = pokle.remainingBoards;
@@ -34,11 +37,13 @@ export const getFlopsWithRecommendations = (
     getProbabilityOfBeingAnswer: (outcomes) => {
       return (outcomes["🟩🟩🟩"] ?? 0) / boards.length;
     },
+    greediness,
   });
 };
 
 export const getTurnsWithRecommendations = (
-  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">,
+  greediness: Greediness
 ) => {
   const cards = pokle.validCards;
   const boards = pokle.remainingBoards;
@@ -53,17 +58,20 @@ export const getTurnsWithRecommendations = (
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
-    getOutcome: (card, board) => Pokle.getCardPattern(card, board[3]),
+    getOutcome: (card, board) =>
+      Pokle.getCardPattern(card, board[3], autocorrect),
     getProbabilityOfBeingAnswer: (outcomes) => {
       const probabilityOfBeingAnswer =
         ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
       return probabilityOfBeingAnswer;
     },
+    greediness,
   });
 };
 
 export const getRiversWithRecommendations = (
-  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">,
+  greediness: Greediness
 ) => {
   const cards = pokle.validCards;
   const boards = pokle.remainingBoards;
@@ -78,12 +86,14 @@ export const getRiversWithRecommendations = (
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
-    getOutcome: (card, board) => Pokle.getCardPattern(card, board[4]),
+    getOutcome: (card, board) =>
+      Pokle.getCardPattern(card, board[4], autocorrect),
     getProbabilityOfBeingAnswer: (outcomes) => {
       const probabilityOfBeingAnswer =
         ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
       return probabilityOfBeingAnswer;
     },
+    greediness,
   });
 };
 
@@ -118,7 +128,8 @@ const getBoardCards = (
 export const mergeRecommendations = (
   flopsWithRecommendation: ChoiceWithRecommendation<FlopCards, string>,
   turnsWithRecommendation: ChoiceWithRecommendation<Card, string>,
-  riversWithRecommendation: ChoiceWithRecommendation<Card, string>
+  riversWithRecommendation: ChoiceWithRecommendation<Card, string>,
+  greediness: Greediness
 ): Recommendation => {
   const entropy = sumBy([
     flopsWithRecommendation,
@@ -130,7 +141,11 @@ export const mergeRecommendations = (
     turnsWithRecommendation.probabilityOfBeingAnswer *
     riversWithRecommendation.probabilityOfBeingAnswer;
 
-  const recommendationIndex = entropy + probabilityOfBeingAnswer;
+  const recommendationIndex = getRecommendationIndex({
+    entropy,
+    probabilityOfBeingAnswer,
+    greediness,
+  });
 
   const choice = [
     ...flopsWithRecommendation.choice,
@@ -148,25 +163,27 @@ export const mergeRecommendations = (
 };
 
 export const getUnrestrictedRecommendation = (
-  pokle: Pick<Pokle, "validCards" | "remainingBoards">
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">,
+  greediness: Greediness
 ): Recommendation => {
-  const flopsWithRecommendation = getFlopsWithRecommendations(pokle).slice(
-    0,
-    10
-  );
-  const turnsWithRecommendation = getTurnsWithRecommendations(pokle).slice(
-    0,
-    10
-  );
-  const riversWithRecommendation = getRiversWithRecommendations(pokle).slice(
-    0,
-    10
-  );
+  const flopsWithRecommendation = getFlopsWithRecommendations(
+    pokle,
+    greediness
+  ).slice(0, 10);
+  const turnsWithRecommendation = getTurnsWithRecommendations(
+    pokle,
+    greediness
+  ).slice(0, 10);
+  const riversWithRecommendation = getRiversWithRecommendations(
+    pokle,
+    greediness
+  ).slice(0, 10);
 
   const firstRecommendation = mergeRecommendations(
     flopsWithRecommendation[0],
     turnsWithRecommendation[0],
-    riversWithRecommendation[0]
+    riversWithRecommendation[0],
+    greediness
   );
 
   if (boardIsValid(firstRecommendation.choice)) {
@@ -178,7 +195,12 @@ export const getUnrestrictedRecommendation = (
   for (const flop of flopsWithRecommendation) {
     for (const turn of turnsWithRecommendation) {
       for (const river of riversWithRecommendation) {
-        const recommendation = mergeRecommendations(flop, turn, river);
+        const recommendation = mergeRecommendations(
+          flop,
+          turn,
+          river,
+          greediness
+        );
         if (
           boardIsValid(recommendation.choice) &&
           (bestRecommendation === undefined ||

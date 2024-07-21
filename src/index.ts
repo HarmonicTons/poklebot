@@ -13,6 +13,7 @@ import {
   getRandomRecommendation,
 } from "./bot/hardMode";
 import { Recommendation } from "./bot/Recommendation";
+import { Greediness } from "./entropy/entropy";
 
 type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze";
 const modeLabel: Record<Mode, string> = {
@@ -22,7 +23,7 @@ const modeLabel: Record<Mode, string> = {
   kamikaze: "kamikaze mode 💣",
 };
 
-const main = async (mode: Mode) => {
+const main = async (mode: Mode, greediness: Greediness) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -41,13 +42,13 @@ const main = async (mode: Mode) => {
     const nextGuess: Recommendation = (() => {
       switch (mode) {
         case "random":
-          return getRandomRecommendation(pokle);
+          return getRandomRecommendation(pokle, greediness);
         case "hard-mode":
-          return getHardModeRecommendation(pokle);
+          return getHardModeRecommendation(pokle, greediness);
         case "unrestricted":
-          return getUnrestrictedRecommendation(pokle);
+          return getUnrestrictedRecommendation(pokle, greediness);
         case "kamikaze":
-          return getKamikazeRecommendation(pokle);
+          return getKamikazeRecommendation(pokle, greediness);
       }
     })();
 
@@ -93,4 +94,4 @@ const main = async (mode: Mode) => {
   console.info(pokle.toString());
 };
 
-main("hard-mode");
+main("hard-mode", 0.5);
