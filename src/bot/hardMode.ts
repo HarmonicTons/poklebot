@@ -8,7 +8,7 @@ import { Recommendation } from "./Recommendation";
  */
 export const getBoardsWithRecommendations = (
   pokle: Pokle,
-  greediness: Greediness
+  greediness: Greediness = 0.5
 ) => {
   const boards = pokle.remainingBoards;
   if (boards === null) {
@@ -37,7 +37,7 @@ export const getBoardsWithRecommendations = (
  */
 export const getHardModeRecommendation = (
   pokle: Pokle,
-  greediness: Greediness
+  greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
     pokle,
@@ -51,7 +51,7 @@ export const getHardModeRecommendation = (
  */
 export const getRandomRecommendation = (
   pokle: Pokle,
-  greediness: Greediness
+  greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
     pokle,
@@ -67,11 +67,19 @@ export const getRandomRecommendation = (
  */
 export const getKamikazeRecommendation = (
   pokle: Pokle,
-  greediness: Greediness
+  greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
     pokle,
     greediness
   );
   return boardsWithRecommendation[boardsWithRecommendation.length - 1];
+};
+
+/**
+ * Greedy mode will always return the most probable option.
+ */
+export const getGreedyRecommendation = (pokle: Pokle): Recommendation => {
+  const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 1);
+  return boardsWithRecommendation[0];
 };

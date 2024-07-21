@@ -8,6 +8,7 @@ import {
 } from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
 import {
+  getGreedyRecommendation,
   getHardModeRecommendation,
   getKamikazeRecommendation,
   getRandomRecommendation,
@@ -15,15 +16,16 @@ import {
 import { Recommendation } from "./bot/Recommendation";
 import { Greediness } from "./entropy/entropy";
 
-type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze";
+type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze" | "greedy";
 const modeLabel: Record<Mode, string> = {
   random: "random mode 🙈",
   "hard-mode": "hard mode 😤",
   unrestricted: "unrestricted mode 🕵️‍♂️",
   kamikaze: "kamikaze mode 💣",
+  greedy: "greedy mode 🤑",
 };
 
-const main = async (mode: Mode, greediness: Greediness) => {
+const main = async (mode: Mode, greediness?: Greediness) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -49,6 +51,8 @@ const main = async (mode: Mode, greediness: Greediness) => {
           return getUnrestrictedRecommendation(pokle, greediness);
         case "kamikaze":
           return getKamikazeRecommendation(pokle, greediness);
+        case "greedy":
+          return getGreedyRecommendation(pokle);
       }
     })();
 
@@ -68,16 +72,16 @@ const main = async (mode: Mode, greediness: Greediness) => {
 
     console.info("Result:", boardPattern.join(""));
 
+    pokle.guessBoard({
+      playedBoard: nextGuess.choice,
+      pattern: boardPattern,
+    });
+
     if (boardPattern.join("") === "🟩🟩🟩🟩🟩") {
       break;
     }
 
     await page.screenshot({ path: `screenshots/guess${guessNumber}.png` });
-
-    pokle.guessBoard({
-      playedBoard: nextGuess.choice,
-      pattern: boardPattern,
-    });
 
     console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
   }
@@ -94,4 +98,4 @@ const main = async (mode: Mode, greediness: Greediness) => {
   console.info(pokle.toString());
 };
 
-main("hard-mode", 0.5);
+main("greedy");

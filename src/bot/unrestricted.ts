@@ -113,18 +113,6 @@ export const boardIsValid = (board: BoardCards): boolean => {
   return true;
 };
 
-const getBoardCards = (
-  flopWithEntropy: ChoiceWithRecommendation<FlopCards, any>,
-  turnWithEntropy: ChoiceWithRecommendation<Card, any>,
-  riverWithEntropy: ChoiceWithRecommendation<Card, any>
-): BoardCards => {
-  return [
-    ...flopWithEntropy.choice,
-    turnWithEntropy.choice,
-    riverWithEntropy.choice,
-  ];
-};
-
 export const mergeRecommendations = (
   flopsWithRecommendation: ChoiceWithRecommendation<FlopCards, string>,
   turnsWithRecommendation: ChoiceWithRecommendation<Card, string>,
@@ -164,7 +152,7 @@ export const mergeRecommendations = (
 
 export const getUnrestrictedRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
-  greediness: Greediness
+  greediness: Greediness = 0.5
 ): Recommendation => {
   const flopsWithRecommendation = getFlopsWithRecommendations(
     pokle,
@@ -178,17 +166,6 @@ export const getUnrestrictedRecommendation = (
     pokle,
     greediness
   ).slice(0, 10);
-
-  const firstRecommendation = mergeRecommendations(
-    flopsWithRecommendation[0],
-    turnsWithRecommendation[0],
-    riversWithRecommendation[0],
-    greediness
-  );
-
-  if (boardIsValid(firstRecommendation.choice)) {
-    return firstRecommendation;
-  }
 
   // look for the valid board with the highest recommendation index
   let bestRecommendation: Recommendation | undefined = undefined;

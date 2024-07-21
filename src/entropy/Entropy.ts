@@ -82,14 +82,20 @@ export const getEntropy = <O extends string | number>({
 export const getRecommendationIndex = ({
   entropy,
   probabilityOfBeingAnswer,
+  entropyToProbabilityScaleFactor = 5,
   greediness,
 }: {
   entropy: number;
   probabilityOfBeingAnswer: number;
+  // value used to bring the probability of being answer to the same scale as entropy
+  entropyToProbabilityScaleFactor?: number;
   // value from 0 to 1, 1: will always choose the most probable answer, 0: will always choose the most entropic answer
   greediness: Greediness;
 }): number => {
-  return entropy * (1 - greediness) + probabilityOfBeingAnswer * greediness;
+  return (
+    entropy * (1 - greediness) +
+    probabilityOfBeingAnswer * entropyToProbabilityScaleFactor * greediness
+  );
 };
 
 /**
@@ -100,6 +106,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   possibleAnswers,
   getOutcome,
   getProbabilityOfBeingAnswer,
+  entropyToProbabilityScaleFactor,
   greediness,
 }: {
   // all possible choices
@@ -108,6 +115,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   possibleAnswers: P[];
   getOutcome: GetOutcome<C, P, O>;
   getProbabilityOfBeingAnswer: GetProbabilityOfBeingAnswer<O>;
+  entropyToProbabilityScaleFactor?: number;
   greediness: Greediness;
 }): ChoiceWithRecommendation<C, O>[] => {
   const choicesWithRecommendations = choices.map((choice) => {
@@ -121,6 +129,7 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
     const recommendationIndex = getRecommendationIndex({
       entropy,
       probabilityOfBeingAnswer,
+      entropyToProbabilityScaleFactor,
       greediness,
     });
 
