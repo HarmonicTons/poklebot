@@ -113,7 +113,7 @@ const getBoardCards = (
   ];
 };
 
-export const getStandardRecommendation = (
+export const getUnrestrictedRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">
 ) => {
   const flopsWithRecommendation = getFlopsWithRecommendations(pokle).slice(

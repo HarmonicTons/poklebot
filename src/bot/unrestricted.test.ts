@@ -1,12 +1,12 @@
 import {
   getFlopsWithRecommendations,
-  getStandardRecommendation,
-} from "./standard";
+  getUnrestrictedRecommendation,
+} from "./unrestricted";
 import { Card } from "../poker/Card";
 import { BoardCards, getBoardFromJson } from "../poker/Poker";
 import { getBoardsWithRecommendations } from "./hardMode";
 
-describe("standard bot", () => {
+describe("unrestricted bot", () => {
   it("2 remainings boards", () => {
     const cards = Card.getAllCards();
     const validCards = cards.filter(
@@ -76,7 +76,7 @@ describe("standard bot", () => {
     );
 
     expect(
-      getStandardRecommendation({
+      getUnrestrictedRecommendation({
         validCards,
         remainingBoards: boards,
       }).boardCards.map((card) => card.toString())

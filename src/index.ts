@@ -1,5 +1,5 @@
 import playwright from "playwright";
-import { getStandardRecommendation } from "./bot/standard";
+import { getUnrestrictedRecommendation } from "./bot/unrestricted";
 import {
   closeAllModals,
   getPlayers,
@@ -10,11 +10,11 @@ import { Pokle } from "./pokle/Pokle";
 import { getHardModeRecommendation } from "./bot/hardMode";
 import { getRandomRecommendation } from "./bot/random";
 
-type Mode = "random" | "hard-mode" | "standard";
+type Mode = "random" | "hard-mode" | "unrestricted";
 const modeLabel: Record<Mode, string> = {
   random: "random mode 🙈",
   "hard-mode": "hard mode 😤",
-  standard: "standard mode 🥱",
+  unrestricted: "unrestricted mode 🕵️‍♂️",
 };
 
 const main = async (mode: Mode) => {
@@ -39,8 +39,8 @@ const main = async (mode: Mode) => {
           return getRandomRecommendation(pokle);
         case "hard-mode":
           return getHardModeRecommendation(pokle).choice;
-        case "standard":
-          return getStandardRecommendation(pokle).boardCards;
+        case "unrestricted":
+          return getUnrestrictedRecommendation(pokle).boardCards;
       }
     })();
 
@@ -80,6 +80,6 @@ const main = async (mode: Mode) => {
   await browser.close();
 };
 
-main("standard");
+main("unrestricted");
 
 // renaim unrestricted + fix duplicated card
