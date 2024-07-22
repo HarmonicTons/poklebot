@@ -21,12 +21,7 @@ export const getBoardsWithRecommendations = (
     getOutcome: (board1, board2) =>
       Pokle.getBoardPattern(board1, board2).join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      const solution = outcomes["🟩🟩🟩🟩🟩"] ?? 0;
-      const solutionsWithAutocorrect =
-        (outcomes["🟩🟩🟩🟦🟩"] ?? 0) +
-        (outcomes["🟩🟩🟩🟩🟦"] ?? 0) +
-        (outcomes["🟩🟩🟩🟦🟦"] ?? 0);
-      return (solution + solutionsWithAutocorrect) / boards.length;
+      return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
     },
     greediness,
   });
@@ -35,7 +30,7 @@ export const getBoardsWithRecommendations = (
 /**
  * Hard mode will return the best valid board
  */
-export const getHardModeRecommendation = (
+export const getRestrictedRecommendation = (
   pokle: Pokle,
   greediness: Greediness = 0.5
 ): Recommendation => {

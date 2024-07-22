@@ -20,7 +20,7 @@ export type Player = {
 
 export type Players = [Player, Player, Player];
 
-const CARD_PATTERNS = ["🟩", "🟦", "🟨", "⬜️"] as const;
+const CARD_PATTERNS = ["🟩", "🟨", "⬜️"] as const;
 export type CardPattern = (typeof CARD_PATTERNS)[number];
 
 export type FlopPattern = [CardPattern, CardPattern, CardPattern];
@@ -300,7 +300,7 @@ export class Pokle {
       return "🟩";
     }
     if (autocorrect && card1.rank === card2.rank) {
-      return "🟦";
+      return "🟩";
     }
     if (card1.rank === card2.rank || card1.suit === card2.suit) {
       return "🟨";

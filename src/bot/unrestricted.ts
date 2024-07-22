@@ -61,8 +61,7 @@ export const getTurnsWithRecommendations = (
     getOutcome: (card, board) =>
       Pokle.getCardPattern(card, board[3], autocorrect),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      const probabilityOfBeingAnswer =
-        ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
+      const probabilityOfBeingAnswer = (outcomes["🟩"] ?? 0) / boards.length;
       return probabilityOfBeingAnswer;
     },
     greediness,
@@ -89,8 +88,7 @@ export const getRiversWithRecommendations = (
     getOutcome: (card, board) =>
       Pokle.getCardPattern(card, board[4], autocorrect),
     getProbabilityOfBeingAnswer: (outcomes) => {
-      const probabilityOfBeingAnswer =
-        ((outcomes["🟩"] ?? 0) + (outcomes["🟦"] ?? 0)) / boards.length;
+      const probabilityOfBeingAnswer = (outcomes["🟩"] ?? 0) / boards.length;
       return probabilityOfBeingAnswer;
     },
     greediness,

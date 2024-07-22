@@ -1,4 +1,12 @@
+import { DateTime } from "luxon";
 import playwright from "playwright";
+import {
+  getGreedyRecommendation,
+  getRestrictedRecommendation,
+  getKamikazeRecommendation,
+  getRandomRecommendation,
+} from "./bot/restricted";
+import { Recommendation } from "./bot/Recommendation";
 import { getUnrestrictedRecommendation } from "./bot/unrestricted";
 import {
   closeAllModals,
@@ -7,23 +15,15 @@ import {
   timeout,
 } from "./playwright/utils";
 import { Pokle } from "./pokle/Pokle";
-import {
-  getGreedyRecommendation,
-  getHardModeRecommendation,
-  getKamikazeRecommendation,
-  getRandomRecommendation,
-} from "./bot/hardMode";
-import { Recommendation } from "./bot/Recommendation";
 import { Greediness } from "./entropy/entropy";
-import { DateTime } from "luxon";
 
-type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze" | "greedy";
+type Mode = "random" | "restricted" | "unrestricted" | "kamikaze" | "greedy";
 const modeLabel: Record<Mode, string> = {
-  random: "random mode 🙈",
-  "hard-mode": "hard mode 😤",
-  unrestricted: "unrestricted mode ⛓️‍💥",
-  kamikaze: "kamikaze mode 💣",
-  greedy: "greedy mode 🤑",
+  random: "Random 🙈",
+  restricted: "Restricted 😤",
+  unrestricted: "Unrestricted ⛓️‍💥",
+  kamikaze: "Kamikaze 💣",
+  greedy: "Greedy 🤑",
 };
 
 const main = async (mode: Mode) => {
@@ -39,18 +39,18 @@ const main = async (mode: Mode) => {
   const pokle = new Pokle(gameId, players);
   pokle.solve();
 
-  console.info(`Playing in ${modeLabel[mode]}`);
+  console.info(`Playing as: ${modeLabel[mode]}`);
   console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
     // increase greediness each turn
-    const greediness = 0.5 + guessNumber * 0.1;
+    const greediness: Greediness = 0.5 + guessNumber * 0.1;
     const nextGuess: Recommendation = (() => {
       switch (mode) {
         case "random":
           return getRandomRecommendation(pokle, greediness);
-        case "hard-mode":
-          return getHardModeRecommendation(pokle, greediness);
+        case "restricted":
+          return getRestrictedRecommendation(pokle, greediness);
         case "unrestricted":
           return getUnrestrictedRecommendation(pokle, greediness);
         case "kamikaze":
@@ -99,8 +99,8 @@ const main = async (mode: Mode) => {
   await browser.close();
 
   console.info("-------");
-  console.info(`Playing in ${modeLabel[mode]}`);
+  console.info(`Playing as: ${modeLabel[mode]}`);
   console.info(pokle.toString());
 };
 
-main("kamikaze");
+main("unrestricted");

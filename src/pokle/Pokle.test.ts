@@ -309,10 +309,10 @@ describe("Pokle", () => {
         const card2 = new Card("2", "♠");
         expect(Pokle.getCardPattern(card1, card2)).toBe("🟩");
       });
-      it("should return 🟦 when autocorrect is on", () => {
+      it("should return 🟩 when autocorrect is on", () => {
         const card1 = new Card("2", "♠");
         const card2 = new Card("2", "♣");
-        expect(Pokle.getCardPattern(card1, card2, true)).toBe("🟦");
+        expect(Pokle.getCardPattern(card1, card2, true)).toBe("🟩");
       });
       it("should return 🟨 for same rank", () => {
         const card1 = new Card("2", "♠");
@@ -484,7 +484,7 @@ describe("Pokle", () => {
         ]);
       });
 
-      it("should return 🟩🟩🟩🟦🟩", () => {
+      it("should return 🟩🟩🟩🟩🟩 with autocorrected turn", () => {
         const board1: BoardCards = [
           new Card("2", "♠"),
           new Card("3", "♠"),
@@ -503,12 +503,12 @@ describe("Pokle", () => {
           "🟩",
           "🟩",
           "🟩",
-          "🟦",
+          "🟩",
           "🟩",
         ]);
       });
 
-      it("should return 🟩🟩🟩🟩🟦", () => {
+      it("should return 🟩🟩🟩🟩🟩 with autocorrected river", () => {
         const board1: BoardCards = [
           new Card("2", "♠"),
           new Card("3", "♠"),
@@ -528,7 +528,7 @@ describe("Pokle", () => {
           "🟩",
           "🟩",
           "🟩",
-          "🟦",
+          "🟩",
         ]);
       });
     });
