@@ -21,12 +21,12 @@ type Mode = "random" | "hard-mode" | "unrestricted" | "kamikaze" | "greedy";
 const modeLabel: Record<Mode, string> = {
   random: "random mode 🙈",
   "hard-mode": "hard mode 😤",
-  unrestricted: "unrestricted mode 🕵️‍♂️",
+  unrestricted: "unrestricted mode ⛓️‍💥",
   kamikaze: "kamikaze mode 💣",
   greedy: "greedy mode 🤑",
 };
 
-const main = async (mode: Mode, greediness?: Greediness) => {
+const main = async (mode: Mode) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -43,6 +43,8 @@ const main = async (mode: Mode, greediness?: Greediness) => {
   console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
+    // increase greediness each turn
+    const greediness = 0.5 + guessNumber * 0.1;
     const nextGuess: Recommendation = (() => {
       switch (mode) {
         case "random":
@@ -61,9 +63,9 @@ const main = async (mode: Mode, greediness?: Greediness) => {
     console.info(
       `Playing: ${JSON.stringify(
         nextGuess.choice.map((card) => card.toString())
-      )} - E: ${nextGuess.entropy.toFixed(
-        4
-      )} - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
+      )} - E: ${
+        isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
+      } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
     );
 
     const boardPattern = await submitGuess(
@@ -97,6 +99,7 @@ const main = async (mode: Mode, greediness?: Greediness) => {
   await browser.close();
 
   console.info("-------");
+  console.info(`Playing in ${modeLabel[mode]}`);
   console.info(pokle.toString());
 };
 

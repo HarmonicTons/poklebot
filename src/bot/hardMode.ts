@@ -80,6 +80,7 @@ export const getKamikazeRecommendation = (
  * Greedy mode will always return the most probable option.
  */
 export const getGreedyRecommendation = (pokle: Pokle): Recommendation => {
-  const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 1);
+  // greediness at 0.99 instead of 1 to choose the best entropy when same probability
+  const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 0.99);
   return boardsWithRecommendation[0];
 };
