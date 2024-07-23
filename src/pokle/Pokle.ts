@@ -414,6 +414,11 @@ export class Pokle {
     throw new Error("Unsupported number of cards");
   }
 
+  public resetGuesses(): void {
+    this.guesses = [];
+    this.isSolved = false;
+  }
+
   public guessBoard({
     playedBoard,
     pattern,

@@ -22,42 +22,63 @@ const main = async (gameId: number, mode: Mode) => {
 
   await pokle.solve();
 
-  console.info(`Playing as: ${modeLabel[mode]}`);
-  console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
+  const solutions = pokle.validBoards as BoardCards[];
+  const nbGuesses = [];
 
-  for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    const nextGuess = getRecommendation(mode, guessNumber, pokle);
+  // TODO
+  // solution ["2♣","4♣","8♥","9♦","7♣"]
+  // make #749 crash on kamikaze
 
-    console.info(
-      `Playing: ${JSON.stringify(
-        nextGuess.choice.map((card) => card.toString())
-      )} - E: ${
-        isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
-      } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
-    );
+  for (const solution of solutions) {
+    console.info("solution", JSON.stringify(solution));
+    // console.info(`Playing as: ${modeLabel[mode]}`);
+    // console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
-    const boardPattern = Pokle.getBoardPattern(
-      nextGuess.choice,
-      pokle.solution as BoardCards
-    );
+    for (let guessNumber = 1; guessNumber <= 12; guessNumber++) {
+      const nextGuess = getRecommendation(mode, guessNumber, pokle);
 
-    console.info("Result:", boardPattern.join(""));
+      // console.info(
+      //   `Playing: ${JSON.stringify(
+      //     nextGuess.choice.map((card) => card.toString())
+      //   )} - E: ${
+      //     isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
+      //   } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
+      // );
 
-    pokle.guessBoard({
-      playedBoard: nextGuess.choice,
-      pattern: boardPattern,
-    });
+      const boardPattern = Pokle.getBoardPattern(nextGuess.choice, solution);
 
-    if (pokle.isSolved) {
-      break;
+      // console.info("Result:", boardPattern.join(""));
+
+      pokle.guessBoard({
+        playedBoard: nextGuess.choice,
+        pattern: boardPattern,
+      });
+
+      if (pokle.isSolved) {
+        break;
+      }
+
+      // console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
     }
 
-    console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
+    // console.info("-------");
+    // console.info(`Playing as: ${modeLabel[mode]}`);
+    // console.info(pokle.toString());
+
+    nbGuesses.push(pokle.guesses.length);
+    pokle.resetGuesses();
   }
 
-  console.info("-------");
-  console.info(`Playing as: ${modeLabel[mode]}`);
-  console.info(pokle.toString());
+  const averageGuesses =
+    nbGuesses.reduce((a, b) => a + b, 0) / nbGuesses.length;
+  console.info(`Average number of guesses: ${averageGuesses.toFixed(2)}`);
+
+  const guessesDistribution = nbGuesses.reduce((acc, nb) => {
+    acc[nb] = (acc[nb] ?? 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+
+  console.log(guessesDistribution);
 };
 
 if (process.argv.length < 4) {

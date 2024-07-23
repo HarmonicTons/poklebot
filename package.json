@@ -13,9 +13,11 @@
   "dependencies": {
     "@types/lodash": "^4.17.7",
     "@types/luxon": "^3.4.2",
+    "@types/memoizee": "^0.4.11",
     "jest": "^29.7.0",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
+    "memoizee": "^0.4.17",
     "playwright": "^1.45.2",
     "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
