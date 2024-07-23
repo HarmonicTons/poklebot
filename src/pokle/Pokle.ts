@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Card, CARD_RANKS, CARD_SUITS } from "../poker/Card";
+import { Card, CARD_RANKS, CARD_SUITS, CardString } from "../poker/Card";
 import { Hand } from "../poker/Hand";
 import {
   FlopCards,
@@ -8,7 +8,9 @@ import {
   BoardCards,
   PlayerCards,
   Stage,
+  getBoardFromJson,
 } from "../poker/Poker";
+import { timeout } from "../playwright/utils";
 
 export type PlayerPosition = 1 | 2 | 3;
 
@@ -40,18 +42,20 @@ export type Guess = {
 };
 
 export class Pokle {
-  public isSolved = false;
+  public areAllPossibleSolutionsComputed = false;
   public validCards: Card[] | null = null;
   public possibleFlops: FlopCards[] | null = null;
   public possibleTurns: TurnCards[] | null = null;
   public possibleRivers: RiverCards[] | null = null;
   public validBoards: BoardCards[] | null = null;
+  public isSolved = false;
 
   public guesses: Guess[] = [];
 
   constructor(
     public readonly gameId: number,
-    public readonly players: Players
+    public readonly players: Players,
+    public solution: BoardCards | null = null
   ) {}
 
   public get remainingBoards() {
@@ -269,19 +273,24 @@ export class Pokle {
     this.validBoards = validBoards;
   }
 
-  public solve(): void {
+  public async solve(): Promise<void> {
     console.debug("Solving Pokle...");
-    this.getAllValidCards();
+    await this.getAllValidCards();
+    await timeout(100);
     console.debug(`${this.validCards?.length} valid cards`);
-    this.getAllPossibleFlops();
+    await this.getAllPossibleFlops();
+    await timeout(100);
     console.debug(`${this.possibleFlops?.length} possible flops`);
-    this.getAllPossibleTurns();
+    await this.getAllPossibleTurns();
+    await timeout(100);
     console.debug(`${this.possibleTurns?.length} possible turns`);
-    this.getAllPossibleRivers();
+    await this.getAllPossibleRivers();
+    await timeout(100);
     console.debug(`${this.possibleRivers?.length} possible rivers`);
-    this.keepOnlyValidBoards();
+    await this.keepOnlyValidBoards();
+    await timeout(100);
     console.debug(`${this.validBoards?.length} valid boards`);
-    this.isSolved = true;
+    this.areAllPossibleSolutionsComputed = true;
   }
 
   public static getGameIdFromDate(date: DateTime): number {
@@ -445,6 +454,13 @@ export class Pokle {
       pattern,
       remainingBoards: nextRemaingBoards,
     });
+
+    if (pattern.join("") === "🟩🟩🟩🟩🟩") {
+      this.isSolved = true;
+      if (this.solution === null) {
+        this.solution = playedBoard;
+      }
+    }
   }
 
   public toString(): string {
@@ -470,22 +486,25 @@ export class Pokle {
     return pokleSummary + "\n" + patterns + "\n\nGuesses:\n" + playedBoards;
   }
 
-  public static fromJSON(gameId: number, json: any): Pokle {
-    const players: Players = json.map((playerJson: any) => {
-      const player: Player = {
-        name: playerJson.name,
-        cards: playerJson.cards.map((cardJson: any) =>
-          Card.fromString(cardJson)
-        ),
-        positions: {
-          flop: Number(playerJson.positions.flop) as PlayerPosition,
-          turn: Number(playerJson.positions.turn) as PlayerPosition,
-          river: Number(playerJson.positions.river) as PlayerPosition,
-        },
-      };
-      return player;
-    });
+  public toJSON() {
+    return {
+      gameId: this.gameId,
+      players: this.players,
+      solution: this.solution,
+    };
+  }
 
-    return new Pokle(gameId, players);
+  public static fromJSON(json: string): Pokle {
+    const { gameId, players, solution } = JSON.parse(json);
+    return new Pokle(
+      gameId,
+      players.map((player: any) => {
+        return {
+          ...player,
+          cards: player.cards.map((card: CardString) => Card.fromString(card)),
+        };
+      }),
+      getBoardFromJson(solution)
+    );
   }
 }

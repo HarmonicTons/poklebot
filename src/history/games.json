@@ -1,0 +1,88 @@
+{
+  "games": [
+    {
+      "gameId": 746,
+      "players": [
+        {
+          "name": "Pam",
+          "cards": ["4♥", "2♠"],
+          "positions": { "flop": 1, "turn": 1, "river": 2 }
+        },
+        {
+          "name": "Sam",
+          "cards": ["9♦", "Q♠"],
+          "positions": { "flop": 2, "turn": 3, "river": 3 }
+        },
+        {
+          "name": "Lam",
+          "cards": ["3♣", "A♣"],
+          "positions": { "flop": 3, "turn": 2, "river": 1 }
+        }
+      ],
+      "solution": ["2♣", "2♦", "9♣", "4♣", "5♣"]
+    },
+    {
+      "gameId": 747,
+      "players": [
+        {
+          "name": "Ron",
+          "cards": ["7♦", "7♠"],
+          "positions": { "flop": 2, "turn": 3, "river": 2 }
+        },
+        {
+          "name": "Don",
+          "cards": ["K♥", "10♠"],
+          "positions": { "flop": 1, "turn": 1, "river": 3 }
+        },
+        {
+          "name": "Lon",
+          "cards": ["5♣", "3♣"],
+          "positions": { "flop": 3, "turn": 2, "river": 1 }
+        }
+      ],
+      "solution": ["3♠", "10♣", "K♣", "5♦", "7♣"]
+    },
+    {
+      "gameId": 748,
+      "players": [
+        {
+          "name": "Jim",
+          "cards": ["K♠", "8♥"],
+          "positions": { "flop": 1, "turn": 2, "river": 1 }
+        },
+        {
+          "name": "Kim",
+          "cards": ["6♦", "10♣"],
+          "positions": { "flop": 3, "turn": 3, "river": 3 }
+        },
+        {
+          "name": "Bim",
+          "cards": ["7♠", "6♠"],
+          "positions": { "flop": 2, "turn": 1, "river": 2 }
+        }
+      ],
+      "solution": ["7♦", "8♠", "K♣", "7♥", "8♣"]
+    },
+    {
+      "gameId": 749,
+      "players": [
+        {
+          "name": "Pam",
+          "cards": ["8♦", "4♥"],
+          "positions": { "flop": 1, "turn": 1, "river": 2 }
+        },
+        {
+          "name": "Sam",
+          "cards": ["K♣", "2♠"],
+          "positions": { "flop": 2, "turn": 3, "river": 3 }
+        },
+        {
+          "name": "Lam",
+          "cards": ["7♠", "9♠"],
+          "positions": { "flop": 3, "turn": 2, "river": 1 }
+        }
+      ],
+      "solution": ["4♦", "6♠", "8♥", "9♣", "10♦"]
+    }
+  ]
+}

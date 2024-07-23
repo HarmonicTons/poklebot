@@ -1,30 +1,14 @@
+import fs from "fs/promises";
 import { DateTime } from "luxon";
 import playwright from "playwright";
-import {
-  getGreedyRecommendation,
-  getRestrictedRecommendation,
-  getKamikazeRecommendation,
-  getRandomRecommendation,
-} from "./bot/restricted";
-import { Recommendation } from "./bot/Recommendation";
-import { getUnrestrictedRecommendation } from "./bot/unrestricted";
+import { getRecommendation, Mode, modeLabel } from "./bot";
 import {
   closeAllModals,
   getPlayers,
   submitGuess,
   timeout,
 } from "./playwright/utils";
-import { Pokle } from "./pokle/Pokle";
-import { Greediness } from "./entropy/entropy";
-
-type Mode = "random" | "restricted" | "unrestricted" | "kamikaze" | "greedy";
-const modeLabel: Record<Mode, string> = {
-  random: "Random 🙈",
-  restricted: "Restricted 😤",
-  unrestricted: "Unrestricted ⛓️‍💥",
-  kamikaze: "Kamikaze 💣",
-  greedy: "Greedy 🤑",
-};
+import { Player, Pokle } from "./pokle/Pokle";
 
 const main = async (mode: Mode) => {
   console.info("Fetching today's Pokle...");
@@ -37,28 +21,13 @@ const main = async (mode: Mode) => {
 
   const gameId = Pokle.getGameIdFromDate(DateTime.now());
   const pokle = new Pokle(gameId, players);
-  pokle.solve();
+  await pokle.solve();
 
   console.info(`Playing as: ${modeLabel[mode]}`);
   console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    // increase greediness each turn
-    const greediness: Greediness = 0.5 + guessNumber * 0.1;
-    const nextGuess: Recommendation = (() => {
-      switch (mode) {
-        case "random":
-          return getRandomRecommendation(pokle, greediness);
-        case "restricted":
-          return getRestrictedRecommendation(pokle, greediness);
-        case "unrestricted":
-          return getUnrestrictedRecommendation(pokle, greediness);
-        case "kamikaze":
-          return getKamikazeRecommendation(pokle, greediness);
-        case "greedy":
-          return getGreedyRecommendation(pokle);
-      }
-    })();
+    const nextGuess = getRecommendation(mode, guessNumber, pokle);
 
     console.info(
       `Playing: ${JSON.stringify(
@@ -81,7 +50,7 @@ const main = async (mode: Mode) => {
       pattern: boardPattern,
     });
 
-    if (boardPattern.join("") === "🟩🟩🟩🟩🟩") {
+    if (pokle.isSolved) {
       break;
     }
 
@@ -101,6 +70,24 @@ const main = async (mode: Mode) => {
   console.info("-------");
   console.info(`Playing as: ${modeLabel[mode]}`);
   console.info(pokle.toString());
+
+  // add the game to the history
+  const gamesHistory = (
+    await fs.readFile("./src/history/games.json", "utf-8")
+  ).toString();
+  const { games } = JSON.parse(gamesHistory) as {
+    games: { gameId: number; players: Player[] }[];
+  };
+  const prevGame = games.find((game) => game.gameId === gameId);
+  if (!prevGame) {
+    games.push(pokle.toJSON());
+    await fs.writeFile("./src/history/games.json", JSON.stringify({ games }));
+  }
 };
 
-main("unrestricted");
+if (process.argv.length < 3) {
+  console.error("Expected one argument: mode");
+  process.exit(1);
+}
+
+main(process.argv[3] as Mode).catch(console.error);
