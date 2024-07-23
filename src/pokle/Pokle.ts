@@ -377,18 +377,40 @@ export class Pokle {
       playedBoard.slice(0, 3) as FlopCards,
       actualBoard.slice(0, 3) as FlopCards
     );
-    // if the flop is correct, the turn and river card color does not matter anymore
-    const autocorrect = flopPattern.join("") === "🟩🟩🟩";
     const turnPattern = Pokle.getCardPattern(
       playedBoard[3],
       actualBoard[3],
-      autocorrect
+      false
     );
     const riverPattern = Pokle.getCardPattern(
       playedBoard[4],
       actualBoard[4],
-      autocorrect
+      false
     );
+    // if the flop is correct, the turn and river card color does not matter anymore
+    const autocorrect =
+      flopPattern.join("") === "🟩🟩🟩" &&
+      (turnPattern === "🟨" || turnPattern === "🟩") &&
+      (riverPattern === "🟨" || riverPattern === "🟩");
+    if (autocorrect) {
+      const turnPatternAutocorrected = Pokle.getCardPattern(
+        playedBoard[3],
+        actualBoard[3],
+        autocorrect
+      );
+      const riverPatternAutocorrected = Pokle.getCardPattern(
+        playedBoard[4],
+        actualBoard[4],
+        autocorrect
+      );
+      if (
+        turnPatternAutocorrected === "🟩" &&
+        riverPatternAutocorrected === "🟩"
+      ) {
+        return ["🟩", "🟩", "🟩", "🟩", "🟩"];
+      }
+    }
+
     return [...flopPattern, turnPattern, riverPattern] as BoardPattern;
   };
 

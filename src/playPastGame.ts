@@ -25,10 +25,6 @@ const main = async (gameId: number, mode: Mode) => {
   const solutions = pokle.validBoards as BoardCards[];
   const nbGuesses = [];
 
-  // TODO
-  // solution ["2♣","4♣","8♥","9♦","7♣"]
-  // make #749 crash on kamikaze
-
   for (const solution of solutions) {
     console.info("solution", JSON.stringify(solution));
     // console.info(`Playing as: ${modeLabel[mode]}`);
@@ -78,7 +74,7 @@ const main = async (gameId: number, mode: Mode) => {
     return acc;
   }, {} as Record<number, number>);
 
-  console.log(guessesDistribution);
+  console.info("Guesses distribution", guessesDistribution);
 };
 
 if (process.argv.length < 4) {

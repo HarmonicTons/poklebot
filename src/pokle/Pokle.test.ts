@@ -531,6 +531,30 @@ describe("Pokle", () => {
           "🟩",
         ]);
       });
+
+      it("should autocorrect only when the rank of the river and turn are ok", () => {
+        const board1: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♣"),
+        ];
+        const board2: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♦"),
+          new Card("7", "♣"),
+        ];
+        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+          "🟩",
+          "🟩",
+          "🟩",
+          "🟨",
+          "🟨",
+        ]);
+      });
     });
 
     describe("keep only board matching pattern", () => {

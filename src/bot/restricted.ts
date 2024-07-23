@@ -68,11 +68,6 @@ export const getKamikazeRecommendation = (
     pokle,
     greediness
   );
-  if (
-    boardsWithRecommendation[boardsWithRecommendation.length - 1] === undefined
-  ) {
-    console.error("No more remaining boards", JSON.stringify(pokle.guesses));
-  }
   return boardsWithRecommendation[boardsWithRecommendation.length - 1];
 };
 
