@@ -51,15 +51,10 @@ export const getTurnsWithRecommendations = (
     throw new Error("Pokle must be solved first");
   }
 
-  // TODO: not sure about this, since in unrestricted mode we look for the flop
-  // independently of the turn and river
-  const autocorrect = true;
-
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
-    getOutcome: (card, board) =>
-      Pokle.getCardPattern(card, board[3], autocorrect),
+    getOutcome: (card, board) => Pokle.getCardPattern(card, board[3], false),
     getProbabilityOfBeingAnswer: (outcomes) => {
       const probabilityOfBeingAnswer = (outcomes["🟩"] ?? 0) / boards.length;
       return probabilityOfBeingAnswer;
@@ -78,15 +73,10 @@ export const getRiversWithRecommendations = (
     throw new Error("Pokle must be solved first");
   }
 
-  // TODO: not sure about this, since in unrestricted mode we look for the flop
-  // independently of the turn and river
-  const autocorrect = true;
-
   return getChoicesWithRecommendations({
     choices: cards,
     possibleAnswers: boards,
-    getOutcome: (card, board) =>
-      Pokle.getCardPattern(card, board[4], autocorrect),
+    getOutcome: (card, board) => Pokle.getCardPattern(card, board[4], false),
     getProbabilityOfBeingAnswer: (outcomes) => {
       const probabilityOfBeingAnswer = (outcomes["🟩"] ?? 0) / boards.length;
       return probabilityOfBeingAnswer;
