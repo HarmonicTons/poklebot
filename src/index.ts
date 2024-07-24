@@ -90,4 +90,4 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-main(process.argv[3] as Mode).catch(console.error);
+main(process.argv[2] as Mode).catch(console.error);

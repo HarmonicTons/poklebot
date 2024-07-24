@@ -83,6 +83,27 @@
         }
       ],
       "solution": ["4♦", "6♠", "8♥", "9♣", "10♦"]
+    },
+    {
+      "gameId": 750,
+      "players": [
+        {
+          "name": "Bex",
+          "cards": ["8♠", "Q♠"],
+          "positions": { "flop": 3, "turn": 3, "river": 3 }
+        },
+        {
+          "name": "Rex",
+          "cards": ["10♦", "4♣"],
+          "positions": { "flop": 2, "turn": 1, "river": 2 }
+        },
+        {
+          "name": "Lex",
+          "cards": ["K♦", "2♠"],
+          "positions": { "flop": 1, "turn": 2, "river": 1 }
+        }
+      ],
+      "solution": ["2♣", "2♥", "4♥", "4♠", "2♦"]
     }
   ]
 }
