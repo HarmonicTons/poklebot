@@ -1,16 +1,22 @@
 import { DateTime } from "luxon";
-import { Card, CARD_RANKS, CARD_SUITS, CardString } from "../poker/Card";
+import { timeout } from "../playwright/utils";
+import {
+  Card,
+  CARD_RANKS,
+  CARD_SUITS,
+  CardString,
+  hexCardRankRecord,
+} from "../poker/Card";
 import { Hand } from "../poker/Hand";
 import {
-  FlopCards,
-  TurnCards,
-  RiverCards,
   BoardCards,
-  PlayerCards,
-  Stage,
+  FlopCards,
   getBoardFromJson,
+  PlayerCards,
+  RiverCards,
+  Stage,
+  TurnCards,
 } from "../poker/Poker";
-import { timeout } from "../playwright/utils";
 
 export type PlayerPosition = 1 | 2 | 3;
 
@@ -65,7 +71,8 @@ export class Pokle {
   }
 
   public getAllValidCards() {
-    // TODO remove obvious kickers (cannot be part of any straight)
+    const playersCards = this.players.flatMap((player) => player.cards);
+
     const usedCards: Record<string, boolean> = {};
     this.players.forEach((player) => {
       player.cards.forEach((card) => {
@@ -75,6 +82,22 @@ export class Pokle {
 
     const validCards: Card[] = [];
     for (const rank of CARD_RANKS) {
+      // check that this rank is not an obvious kicker
+      // meaning that it could form a hand with at least one player's cards
+      const isObviousKicker = playersCards.every((playerCard) => {
+        const couldBePartOfTheSameStraight = Hand.couldBePartOfTheSameStraight(
+          hexCardRankRecord[rank],
+          playerCard.hexRank
+        );
+        const isSameRank = hexCardRankRecord[rank] === playerCard.hexRank;
+        const couldBeKicker =
+          couldBePartOfTheSameStraight === false && isSameRank === false;
+        return couldBeKicker;
+      });
+
+      if (isObviousKicker) {
+        continue;
+      }
       for (const suit of CARD_SUITS) {
         const card = new Card(rank, suit);
         if (usedCards[card.toString()]) {

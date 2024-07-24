@@ -7,7 +7,7 @@ describe("Pokle", () => {
     it("should have 46 valid cards", () => {
       const players: Players = [
         {
-          cards: [new Card("2", "♠"), new Card("3", "♠")],
+          cards: [new Card("2", "♠"), new Card("5", "♠")],
           name: "Jaz",
           positions: {
             flop: 1,
@@ -16,7 +16,7 @@ describe("Pokle", () => {
           },
         },
         {
-          cards: [new Card("4", "♠"), new Card("5", "♠")],
+          cards: [new Card("10", "♠"), new Card("K", "♠")],
           name: "Baz",
           positions: {
             flop: 2,
@@ -25,7 +25,7 @@ describe("Pokle", () => {
           },
         },
         {
-          cards: [new Card("6", "♠"), new Card("7", "♠")],
+          cards: [new Card("A", "♠"), new Card("8", "♠")],
           name: "Taz",
           positions: {
             flop: 3,
@@ -38,6 +38,42 @@ describe("Pokle", () => {
       const pokle = new Pokle(0, players);
       pokle.getAllValidCards();
       expect((pokle.validCards ?? []).length).toBe(46);
+    });
+
+    it("should have 42 valid cards because all the 2s are obvious kickers", () => {
+      const players: Players = [
+        {
+          cards: [new Card("7", "♠"), new Card("9", "♠")],
+          name: "Jaz",
+          positions: {
+            flop: 1,
+            river: 2,
+            turn: 3,
+          },
+        },
+        {
+          cards: [new Card("10", "♠"), new Card("J", "♠")],
+          name: "Baz",
+          positions: {
+            flop: 2,
+            river: 3,
+            turn: 1,
+          },
+        },
+        {
+          cards: [new Card("K", "♠"), new Card("K", "♥")],
+          name: "Taz",
+          positions: {
+            flop: 3,
+            river: 1,
+            turn: 2,
+          },
+        },
+      ];
+
+      const pokle = new Pokle(0, players);
+      pokle.getAllValidCards();
+      expect((pokle.validCards ?? []).length).toBe(42);
     });
   });
 

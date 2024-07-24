@@ -360,4 +360,22 @@ describe("Hand", () => {
       expect(bestHand.hexScore).toBe("2ee229");
     });
   });
+
+  describe("Could be part of the same straight", () => {
+    it("should return true", () => {
+      expect(Hand.couldBePartOfTheSameStraight("3", "7")).toBe(true);
+    });
+    it("should return false because they are too far from each other", () => {
+      expect(Hand.couldBePartOfTheSameStraight("2", "7")).toBe(false);
+    });
+    it("should return false because they have the same rank", () => {
+      expect(Hand.couldBePartOfTheSameStraight("7", "7")).toBe(false);
+    });
+    it("should return true", () => {
+      expect(Hand.couldBePartOfTheSameStraight("b", "e")).toBe(true);
+    });
+    it("should return true because ace can be 1", () => {
+      expect(Hand.couldBePartOfTheSameStraight("3", "e")).toBe(true);
+    });
+  });
 });

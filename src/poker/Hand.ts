@@ -250,4 +250,24 @@ export class Hand {
   public isWorseThan(hand: Hand): boolean {
     return this.hexScore < hand.hexScore;
   }
+
+  public static couldBePartOfTheSameStraight(
+    hexRank1: HexCardRank,
+    hexRank2: HexCardRank
+  ): boolean {
+    if (hexRank1 === hexRank2) {
+      return false;
+    }
+    if (hexRank1 === "e") {
+      if (Math.abs(1 - parseInt(hexRank2, 16)) <= 4) {
+        return true;
+      }
+    }
+    if (hexRank2 === "e") {
+      if (Math.abs(1 - parseInt(hexRank1, 16)) <= 4) {
+        return true;
+      }
+    }
+    return Math.abs(parseInt(hexRank1, 16) - parseInt(hexRank2, 16)) <= 4;
+  }
 }
