@@ -523,7 +523,7 @@ export class Pokle {
     const patterns = this.guesses
       .map(
         (guess) =>
-          guess.pattern.join("") +
+          guess.pattern.join("").replace("⬜️", ":white_large_square:") +
           " - " +
           guess.remainingBoards.length +
           " remaining"
