@@ -125,6 +125,48 @@
         }
       ],
       "solution": ["10♣", "J♣", "Q♦", "Q♣", "K♣"]
+    },
+    {
+      "gameId": 752,
+      "players": [
+        {
+          "name": "Sue",
+          "cards": ["8♣", "8♥"],
+          "positions": { "flop": 3, "turn": 3, "river": 2 }
+        },
+        {
+          "name": "Rue",
+          "cards": ["6♥", "6♠"],
+          "positions": { "flop": 2, "turn": 1, "river": 1 }
+        },
+        {
+          "name": "Boo",
+          "cards": ["3♠", "2♣"],
+          "positions": { "flop": 1, "turn": 2, "river": 3 }
+        }
+      ],
+      "solution": ["4♦", "5♥", "6♦", "6♣", "8♠"]
+    },
+    {
+      "gameId": 753,
+      "players": [
+        {
+          "name": "Jaz",
+          "cards": ["8♦", "K♥"],
+          "positions": { "flop": 2, "turn": 3, "river": 2 }
+        },
+        {
+          "name": "Baz",
+          "cards": ["7♠", "5♥"],
+          "positions": { "flop": 3, "turn": 1, "river": 1 }
+        },
+        {
+          "name": "Raz",
+          "cards": ["8♥", "5♣"],
+          "positions": { "flop": 1, "turn": 2, "river": 3 }
+        }
+      ],
+      "solution": ["5♦", "6♥", "8♠", "4♠", "K♣"]
     }
   ]
 }
