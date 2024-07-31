@@ -521,12 +521,12 @@ export class Pokle {
     const pokleSummary = `#Poklebot #${this.gameId} - ${this.validBoards.length} possible solutions`;
 
     const patterns = this.guesses
-      .map(
-        (guess) =>
-          guess.pattern.join("").replaceAll("⬜️", ":white_large_square:") +
-          " - " +
-          guess.remainingBoards.length +
-          " remaining"
+      .map((guess) =>
+        guess.pattern.join("").replaceAll("⬜️", ":white_large_square:") +
+          guess.pattern.join("") ===
+        "🟩🟩🟩🟩🟩"
+          ? ""
+          : " - " + guess.remainingBoards.length + " remaining"
       )
       .join("\n");
     const playedBoards = this.guesses
