@@ -143,13 +143,13 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   return orderBy(choicesWithRecommendations, "recommendationIndex", "desc");
 };
 
-const throttledLog = throttle(console.log, 10000, {
+const throttledLog = throttle(console.log, 30000, {
   leading: false,
   trailing: false,
 });
 
 /**
- * Get recommendations for all choices
+ * Get best recommendation (used by Slowking for memory reasons)
  */
 export const getChoiceWithRecommendation = <C, P, O extends string | number>({
   choices,

@@ -11,6 +11,9 @@ import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 import { Recommendation } from "./Recommendation";
 
+/**
+ * Slowking evaluate all 27 million possibles guesses
+ */
 export const getSlowkingRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
   greediness: Greediness
@@ -197,6 +200,10 @@ export const mergeRecommendations = (
   };
 };
 
+/**
+ * Unrestricted evaluates all 15180 flops + 43 turns + 42 rivers independently
+ * it's faster than Slowking but not as good and autocorrected cannot be implemented
+ */
 export const getUnrestrictedRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
   greediness: Greediness = 0.5

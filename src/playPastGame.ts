@@ -25,9 +25,13 @@ const main = async (gameId: number, mode: Mode) => {
   const solutions = pokle.validBoards as BoardCards[];
   const nbGuesses = [];
 
-  for (const solution of solutions) {
+  for (const solutionIndex in solutions) {
+    const solution = solutions[solutionIndex];
     console.info("=======");
-    console.info("solution", JSON.stringify(solution));
+    console.info(
+      `solution ${Number(solutionIndex) + 1} / ${solutions.length} :`,
+      JSON.stringify(solution)
+    );
     // console.info(`Playing as: ${modeLabel[mode]}`);
     // console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
