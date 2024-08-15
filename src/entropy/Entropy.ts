@@ -169,7 +169,7 @@ export const getChoiceWithRecommendation = <C, P, O extends string | number>({
       console.log(
         `${DateTime.now().toLocaleString(
           DateTime.TIME_24_WITH_SECONDS
-        )} Progress: ${Math.floor((index / choices.length) * 100)}%`
+        )} Progress: ${Math.ceil((index / choices.length) * 100)}%`
       );
     }
     const outcomes = getAllPossibleOutcomes({
