@@ -2,6 +2,7 @@ import { sum, sumBy } from "lodash";
 import {
   ChoiceWithRecommendation,
   getChoicesWithRecommendations,
+  getChoiceWithRecommendation,
   getRecommendationIndex,
   Greediness,
 } from "../entropy/entropy";
@@ -9,6 +10,55 @@ import { Card } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 import { Recommendation } from "./Recommendation";
+
+export const getSlowkingRecommendation = (
+  pokle: Pick<Pokle, "validCards" | "remainingBoards">,
+  greediness: Greediness
+) => {
+  const cards = pokle.validCards;
+  const boards = pokle.remainingBoards;
+  if (cards === null || boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+
+  const playedBoards: BoardCards[] = [];
+  for (let i = 0; i < cards.length; i++) {
+    for (let j = i + 1; j < cards.length; j++) {
+      for (let k = j + 1; k < cards.length; k++) {
+        for (let l = 0; l < cards.length; l++) {
+          if (i === l || j === l || k === l) {
+            continue;
+          }
+          for (let m = 0; m < cards.length; m++) {
+            if (i === m || j === m || k === m || l === m) {
+              continue;
+            }
+            playedBoards.push([
+              cards[i],
+              cards[j],
+              cards[k],
+              cards[m],
+              cards[l],
+            ]);
+          }
+        }
+      }
+    }
+  }
+
+  console.log("Possible guesses: ", playedBoards.length);
+
+  return getChoiceWithRecommendation({
+    choices: playedBoards,
+    possibleAnswers: boards,
+    getOutcome: (board1, board2) =>
+      Pokle.getBoardPattern(board1, board2).join(""),
+    getProbabilityOfBeingAnswer: (outcomes) => {
+      return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
+    },
+    greediness,
+  });
+};
 
 export const getFlopsWithRecommendations = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
@@ -132,7 +182,6 @@ export const mergeRecommendations = (
   return {
     choice,
     entropy,
-    outcomes: {},
     probabilityOfBeingAnswer,
     recommendationIndex,
   };

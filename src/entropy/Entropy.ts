@@ -1,4 +1,5 @@
 import { orderBy, sumBy } from "lodash";
+import { DateTime } from "luxon";
 
 type OutcomesDistribution<O extends string | number> = Record<O, number>;
 type Entropy = number;
@@ -9,7 +10,6 @@ export type Greediness = number;
 
 export type ChoiceWithRecommendation<C, O extends string | number> = {
   choice: C;
-  outcomes: OutcomesDistribution<O>;
   entropy: Entropy;
   recommendationIndex: RecommendationIndex;
   probabilityOfBeingAnswer: number;
@@ -135,11 +135,69 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
 
     return {
       choice,
-      outcomes,
       entropy,
       recommendationIndex,
       probabilityOfBeingAnswer,
     };
   });
   return orderBy(choicesWithRecommendations, "recommendationIndex", "desc");
+};
+
+/**
+ * Get recommendations for all choices
+ */
+export const getChoiceWithRecommendation = <C, P, O extends string | number>({
+  choices,
+  possibleAnswers,
+  getOutcome,
+  getProbabilityOfBeingAnswer,
+  entropyToProbabilityScaleFactor,
+  greediness,
+}: {
+  // all possible choices
+  choices: C[];
+  // all possibles answers
+  possibleAnswers: P[];
+  getOutcome: GetOutcome<C, P, O>;
+  getProbabilityOfBeingAnswer: GetProbabilityOfBeingAnswer<O>;
+  entropyToProbabilityScaleFactor?: number;
+  greediness: Greediness;
+}): ChoiceWithRecommendation<C, O> => {
+  let bestChoice: ChoiceWithRecommendation<C, O> | undefined;
+  choices.forEach((choice, index) => {
+    if (index % Math.floor(choices.length / 100) === 0) {
+      console.log(
+        `${DateTime.now().toLocaleString(
+          DateTime.TIME_24_WITH_SECONDS
+        )} Progress: ${Math.floor((index / choices.length) * 100)}%`
+      );
+    }
+    const outcomes = getAllPossibleOutcomes({
+      choice,
+      possibleAnswers,
+      getOutcome,
+    });
+    const entropy = getEntropy({ outcomes });
+    const probabilityOfBeingAnswer = getProbabilityOfBeingAnswer(outcomes);
+    const recommendationIndex = getRecommendationIndex({
+      entropy,
+      probabilityOfBeingAnswer,
+      entropyToProbabilityScaleFactor,
+      greediness,
+    });
+
+    const currentChoice = {
+      choice,
+      entropy,
+      recommendationIndex,
+      probabilityOfBeingAnswer,
+    };
+    if (
+      !bestChoice ||
+      currentChoice.recommendationIndex > bestChoice.recommendationIndex
+    ) {
+      bestChoice = currentChoice;
+    }
+  });
+  return bestChoice as ChoiceWithRecommendation<C, O>;
 };

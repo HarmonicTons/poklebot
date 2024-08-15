@@ -7,7 +7,10 @@ import {
   getRandomRecommendation,
   getRestrictedRecommendation,
 } from "./restricted";
-import { getUnrestrictedRecommendation } from "./unrestricted";
+import {
+  getSlowkingRecommendation,
+  getUnrestrictedRecommendation,
+} from "./unrestricted";
 import memoize from "memoizee";
 
 export type Mode =
@@ -15,13 +18,15 @@ export type Mode =
   | "restricted"
   | "unrestricted"
   | "kamikaze"
-  | "greedy";
+  | "greedy"
+  | "slowking";
 export const modeLabel: Record<Mode, string> = {
   random: "Random 🙈",
   restricted: "Restricted 😤",
   unrestricted: "Unrestricted ⛓️‍💥",
   kamikaze: "Kamikaze 💣",
   greedy: "Greedy 🤑",
+  slowking: "Slowking 👑🐚",
 };
 
 export const getRecommendation = memoize(
@@ -40,6 +45,8 @@ export const getRecommendation = memoize(
           return getKamikazeRecommendation(pokle, greediness);
         case "greedy":
           return getGreedyRecommendation(pokle);
+        case "slowking":
+          return getSlowkingRecommendation(pokle, greediness);
       }
     })();
 
