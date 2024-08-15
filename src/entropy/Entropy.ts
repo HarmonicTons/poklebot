@@ -1,4 +1,4 @@
-import { orderBy, sumBy } from "lodash";
+import { orderBy, sumBy, throttle } from "lodash";
 import { DateTime } from "luxon";
 
 type OutcomesDistribution<O extends string | number> = Record<O, number>;
@@ -143,6 +143,11 @@ export const getChoicesWithRecommendations = <C, P, O extends string | number>({
   return orderBy(choicesWithRecommendations, "recommendationIndex", "desc");
 };
 
+const throttledLog = throttle(console.log, 10000, {
+  leading: false,
+  trailing: false,
+});
+
 /**
  * Get recommendations for all choices
  */
@@ -165,13 +170,11 @@ export const getChoiceWithRecommendation = <C, P, O extends string | number>({
 }): ChoiceWithRecommendation<C, O> => {
   let bestChoice: ChoiceWithRecommendation<C, O> | undefined;
   choices.forEach((choice, index) => {
-    if (index % Math.floor(choices.length / 100) === 0) {
-      console.log(
-        `${DateTime.now().toLocaleString(
-          DateTime.TIME_24_WITH_SECONDS
-        )} Progress: ${Math.ceil((index / choices.length) * 100)}%`
-      );
-    }
+    throttledLog(
+      `${DateTime.now().toLocaleString(
+        DateTime.TIME_24_WITH_SECONDS
+      )} Progress: ${Math.ceil((index / choices.length) * 100)}%`
+    );
     const outcomes = getAllPossibleOutcomes({
       choice,
       possibleAnswers,

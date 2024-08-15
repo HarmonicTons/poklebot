@@ -26,6 +26,7 @@ const main = async (gameId: number, mode: Mode) => {
   const nbGuesses = [];
 
   for (const solution of solutions) {
+    console.info("=======");
     console.info("solution", JSON.stringify(solution));
     // console.info(`Playing as: ${modeLabel[mode]}`);
     // console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
@@ -33,17 +34,17 @@ const main = async (gameId: number, mode: Mode) => {
     for (let guessNumber = 1; guessNumber <= 12; guessNumber++) {
       const nextGuess = getRecommendation(mode, guessNumber, pokle);
 
-      // console.info(
-      //   `Playing: ${JSON.stringify(
-      //     nextGuess.choice.map((card) => card.toString())
-      //   )} - E: ${
-      //     isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
-      //   } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
-      // );
+      console.info(
+        `Playing: ${JSON.stringify(
+          nextGuess.choice.map((card) => card.toString())
+        )} - E: ${
+          isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
+        } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
+      );
 
       const boardPattern = Pokle.getBoardPattern(nextGuess.choice, solution);
 
-      // console.info("Result:", boardPattern.join(""));
+      console.info("Result:", boardPattern.join(""));
 
       pokle.guessBoard({
         playedBoard: nextGuess.choice,
@@ -64,6 +65,7 @@ const main = async (gameId: number, mode: Mode) => {
     nbGuesses.push(pokle.guesses.length);
     pokle.resetGuesses();
   }
+  console.info("=======");
 
   const averageGuesses =
     nbGuesses.reduce((a, b) => a + b, 0) / nbGuesses.length;

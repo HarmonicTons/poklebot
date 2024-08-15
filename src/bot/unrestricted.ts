@@ -54,8 +54,6 @@ export const getSlowkingRecommendation = (
     }
   }
 
-  console.log("Possible guesses: ", playedBoards.length);
-
   return getChoiceWithRecommendation({
     choices: playedBoards,
     possibleAnswers: boards,
