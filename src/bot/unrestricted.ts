@@ -20,6 +20,14 @@ export const getSlowkingRecommendation = (
   if (cards === null || boards === null) {
     throw new Error("Pokle must be solved first");
   }
+  if (boards.length === 1) {
+    return {
+      choice: boards[0],
+      entropy: 0,
+      probabilityOfBeingAnswer: 1,
+      recommendationIndex: 1,
+    };
+  }
 
   const playedBoards: BoardCards[] = [];
   for (let i = 0; i < cards.length; i++) {
@@ -191,6 +199,20 @@ export const getUnrestrictedRecommendation = (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
   greediness: Greediness = 0.5
 ): Recommendation => {
+  const cards = pokle.validCards;
+  const boards = pokle.remainingBoards;
+  if (cards === null || boards === null) {
+    throw new Error("Pokle must be solved first");
+  }
+  if (boards.length === 1) {
+    return {
+      choice: boards[0],
+      entropy: 0,
+      probabilityOfBeingAnswer: 1,
+      recommendationIndex: 1,
+    };
+  }
+
   const flopsWithRecommendation = getFlopsWithRecommendations(
     pokle,
     greediness
