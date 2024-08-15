@@ -1,4 +1,4 @@
-import { sum, sumBy } from "lodash";
+import { sumBy } from "lodash";
 import {
   ChoiceWithRecommendation,
   getChoicesWithRecommendations,
@@ -58,7 +58,11 @@ export const getSlowkingRecommendation = (
     choices: playedBoards,
     possibleAnswers: boards,
     getOutcome: (board1, board2) =>
-      Pokle.getBoardPattern(board1, board2).join(""),
+      Pokle.getBoardPattern(
+        board1,
+        board2,
+        pokle.remainingBoards as BoardCards[]
+      ).join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
       return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
     },

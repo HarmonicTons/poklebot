@@ -42,7 +42,11 @@ const main = async (gameId: number, mode: Mode) => {
         } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
       );
 
-      const boardPattern = Pokle.getBoardPattern(nextGuess.choice, solution);
+      const boardPattern = Pokle.getBoardPattern(
+        nextGuess.choice,
+        solution,
+        pokle.remainingBoards as BoardCards[]
+      );
 
       console.info("Result:", boardPattern.join(""));
 
@@ -55,7 +59,7 @@ const main = async (gameId: number, mode: Mode) => {
         break;
       }
 
-      // console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
+      console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
     }
 
     // console.info("-------");

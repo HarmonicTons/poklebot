@@ -58,7 +58,7 @@ export const getRecommendation = memoize(
         mode,
         guessNumber,
         pokle,
-        remainingBaords: pokle.remainingBoards,
+        remainingBoards: pokle.remainingBoards,
       });
     },
   }

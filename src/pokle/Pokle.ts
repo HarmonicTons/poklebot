@@ -394,7 +394,8 @@ export class Pokle {
 
   public static getBoardPattern = (
     playedBoard: BoardCards,
-    actualBoard: BoardCards
+    actualBoard: BoardCards,
+    remainingBoards: BoardCards[]
   ): BoardPattern => {
     const flopPattern = Pokle.getFlopPattern(
       playedBoard.slice(0, 3) as FlopCards,
@@ -415,7 +416,10 @@ export class Pokle {
       flopPattern.join("") === "🟩🟩🟩" &&
       (turnPattern === "🟨" || turnPattern === "🟩") &&
       (riverPattern === "🟨" || riverPattern === "🟩");
-    if (autocorrect) {
+    const isValidSolution = remainingBoards.find((b) =>
+      b.every((c, i) => c.isEqual(playedBoard[i]))
+    );
+    if (autocorrect && isValidSolution) {
       const turnPatternAutocorrected = Pokle.getCardPattern(
         playedBoard[3],
         actualBoard[3],
@@ -437,7 +441,11 @@ export class Pokle {
     return [...flopPattern, turnPattern, riverPattern] as BoardPattern;
   };
 
-  public static getPattern(playedCards: Card[], actualCards: Card[]): string[] {
+  public static getPattern(
+    playedCards: Card[],
+    actualCards: Card[],
+    remainingBoards: BoardCards[]
+  ): string[] {
     if (playedCards.length !== actualCards.length) {
       throw new Error("playedCards and actualCards must have the same length");
     }
@@ -453,7 +461,8 @@ export class Pokle {
     if (playedCards.length === 5) {
       return Pokle.getBoardPattern(
         playedCards as BoardCards,
-        actualCards as BoardCards
+        actualCards as BoardCards,
+        remainingBoards
       );
     }
     throw new Error("Unsupported number of cards");

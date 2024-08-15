@@ -1,4 +1,5 @@
 import { getChoicesWithRecommendations, Greediness } from "../entropy/entropy";
+import { BoardCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 import { Recommendation } from "./Recommendation";
 
@@ -19,7 +20,11 @@ export const getBoardsWithRecommendations = (
     choices: boards,
     possibleAnswers: boards,
     getOutcome: (board1, board2) =>
-      Pokle.getBoardPattern(board1, board2).join(""),
+      Pokle.getBoardPattern(
+        board1,
+        board2,
+        pokle.remainingBoards as BoardCards[]
+      ).join(""),
     getProbabilityOfBeingAnswer: (outcomes) => {
       return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
     },

@@ -487,7 +487,7 @@ describe("Pokle", () => {
           new Card("5", "♠"),
           new Card("6", "♠"),
         ];
-        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+        expect(Pokle.getBoardPattern(board1, board2, [board2])).toEqual([
           "🟩",
           "🟩",
           "🟩",
@@ -511,7 +511,7 @@ describe("Pokle", () => {
           new Card("6", "♠"),
           new Card("7", "♦"),
         ];
-        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+        expect(Pokle.getBoardPattern(board1, board2, [board2])).toEqual([
           "🟩",
           "⬜️",
           "⬜️",
@@ -535,13 +535,9 @@ describe("Pokle", () => {
           new Card("5", "♣"),
           new Card("6", "♠"),
         ];
-        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
-          "🟩",
-          "🟩",
-          "🟩",
-          "🟩",
-          "🟩",
-        ]);
+        expect(Pokle.getBoardPattern(board1, board2, [board1, board2])).toEqual(
+          ["🟩", "🟩", "🟩", "🟩", "🟩"]
+        );
       });
 
       it("should return 🟩🟩🟩🟩🟩 with autocorrected river", () => {
@@ -559,13 +555,9 @@ describe("Pokle", () => {
           new Card("5", "♠"),
           new Card("6", "♠"),
         ];
-        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
-          "🟩",
-          "🟩",
-          "🟩",
-          "🟩",
-          "🟩",
-        ]);
+        expect(Pokle.getBoardPattern(board1, board2, [board1, board2])).toEqual(
+          ["🟩", "🟩", "🟩", "🟩", "🟩"]
+        );
       });
 
       it("should autocorrect only when the rank of the river and turn are ok", () => {
@@ -583,7 +575,27 @@ describe("Pokle", () => {
           new Card("5", "♦"),
           new Card("7", "♣"),
         ];
-        expect(Pokle.getBoardPattern(board1, board2)).toEqual([
+        expect(Pokle.getBoardPattern(board1, board2, [board1, board2])).toEqual(
+          ["🟩", "🟩", "🟩", "🟨", "🟨"]
+        );
+      });
+
+      it("should autocorrect only when the played board is a valid solution", () => {
+        const board1: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♠"),
+          new Card("6", "♥"),
+        ];
+        const board2: BoardCards = [
+          new Card("2", "♠"),
+          new Card("3", "♠"),
+          new Card("4", "♠"),
+          new Card("5", "♣"),
+          new Card("6", "♠"),
+        ];
+        expect(Pokle.getBoardPattern(board1, board2, [board2])).toEqual([
           "🟩",
           "🟩",
           "🟩",
