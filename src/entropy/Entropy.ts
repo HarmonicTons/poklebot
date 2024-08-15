@@ -173,7 +173,7 @@ export const getChoiceWithRecommendation = <C, P, O extends string | number>({
     throttledLog(
       `${DateTime.now().toLocaleString(
         DateTime.TIME_24_WITH_SECONDS
-      )} Progress: ${Math.ceil((index / choices.length) * 100)}%`
+      )} Progress: ${Math.floor((index / choices.length) * 100)}%`
     );
     const outcomes = getAllPossibleOutcomes({
       choice,

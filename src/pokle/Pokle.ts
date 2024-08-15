@@ -416,25 +416,28 @@ export class Pokle {
       flopPattern.join("") === "🟩🟩🟩" &&
       (turnPattern === "🟨" || turnPattern === "🟩") &&
       (riverPattern === "🟨" || riverPattern === "🟩");
-    const isValidSolution = remainingBoards.find((b) =>
-      b.every((c, i) => c.isEqual(playedBoard[i]))
-    );
-    if (autocorrect && isValidSolution) {
-      const turnPatternAutocorrected = Pokle.getCardPattern(
-        playedBoard[3],
-        actualBoard[3],
-        autocorrect
+    if (autocorrect) {
+      // still has to be a valid solution for it to be autocorrected
+      const isValidSolution = remainingBoards.find((b) =>
+        b.every((c, i) => c.isEqual(playedBoard[i]))
       );
-      const riverPatternAutocorrected = Pokle.getCardPattern(
-        playedBoard[4],
-        actualBoard[4],
-        autocorrect
-      );
-      if (
-        turnPatternAutocorrected === "🟩" &&
-        riverPatternAutocorrected === "🟩"
-      ) {
-        return ["🟩", "🟩", "🟩", "🟩", "🟩"];
+      if (isValidSolution) {
+        const turnPatternAutocorrected = Pokle.getCardPattern(
+          playedBoard[3],
+          actualBoard[3],
+          autocorrect
+        );
+        const riverPatternAutocorrected = Pokle.getCardPattern(
+          playedBoard[4],
+          actualBoard[4],
+          autocorrect
+        );
+        if (
+          turnPatternAutocorrected === "🟩" &&
+          riverPatternAutocorrected === "🟩"
+        ) {
+          return ["🟩", "🟩", "🟩", "🟩", "🟩"];
+        }
       }
     }
 
