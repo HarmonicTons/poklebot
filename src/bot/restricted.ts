@@ -8,7 +8,7 @@ import { Recommendation } from "./Recommendation";
  * ie. the board must respect the score of each player.
  */
 export const getBoardsWithRecommendations = (
-  pokle: Pokle,
+  pokle: Pick<Pokle, "remainingBoards">,
   greediness: Greediness = 0.5
 ) => {
   const boards = pokle.remainingBoards;
@@ -36,7 +36,7 @@ export const getBoardsWithRecommendations = (
  * Hard mode will return the best valid board
  */
 export const getRestrictedRecommendation = (
-  pokle: Pokle,
+  pokle: Pick<Pokle, "remainingBoards">,
   greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
@@ -50,7 +50,7 @@ export const getRestrictedRecommendation = (
  * Random mode will return a random board from the remaining boards.
  */
 export const getRandomRecommendation = (
-  pokle: Pokle,
+  pokle: Pick<Pokle, "remainingBoards">,
   greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
@@ -66,7 +66,7 @@ export const getRandomRecommendation = (
  * Kamikaze mode will always return the worst option.
  */
 export const getKamikazeRecommendation = (
-  pokle: Pokle,
+  pokle: Pick<Pokle, "remainingBoards">,
   greediness: Greediness = 0.5
 ): Recommendation => {
   const boardsWithRecommendation = getBoardsWithRecommendations(
@@ -79,7 +79,9 @@ export const getKamikazeRecommendation = (
 /**
  * Greedy mode will always return the most probable option.
  */
-export const getGreedyRecommendation = (pokle: Pokle): Recommendation => {
+export const getGreedyRecommendation = (
+  pokle: Pick<Pokle, "remainingBoards">
+): Recommendation => {
   // greediness at 0.99 instead of 1 to choose the best entropy when same probability
   const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 0.99);
   return boardsWithRecommendation[0];

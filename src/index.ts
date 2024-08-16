@@ -27,7 +27,7 @@ const main = async (mode: Mode) => {
   console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
   for (let guessNumber = 1; guessNumber <= 6; guessNumber++) {
-    const nextGuess = getRecommendation(mode, guessNumber, pokle);
+    const nextGuess = await getRecommendation(mode, guessNumber, pokle);
 
     console.info(
       `Playing: ${JSON.stringify(

@@ -1,6 +1,6 @@
+import memoize from "memoizee";
 import { Greediness } from "../entropy/entropy";
 import { Pokle } from "../pokle/Pokle";
-import { Recommendation } from "./Recommendation";
 import {
   getGreedyRecommendation,
   getKamikazeRecommendation,
@@ -11,7 +11,6 @@ import {
   getSlowkingRecommendation,
   getUnrestrictedRecommendation,
 } from "./unrestricted";
-import memoize from "memoizee";
 
 export type Mode =
   | "random"
@@ -38,10 +37,18 @@ const getGreediness = (guessNumber: number): Greediness => {
 };
 
 export const getRecommendation = memoize(
-  (mode: Mode, guessNumber: number, pokle: Pokle) => {
+  async (mode: Mode, guessNumber: number, pokle: Pokle) => {
+    if (pokle.remainingBoards?.length === 1) {
+      return {
+        choice: pokle.remainingBoards[0],
+        entropy: NaN,
+        probabilityOfBeingAnswer: 1,
+        recommendationIndex: 1,
+      };
+    }
     // increase greediness each turn
     const greediness: Greediness = getGreediness(guessNumber);
-    const recommendation: Recommendation = (() => {
+    const recommendation = (() => {
       switch (mode) {
         case "random":
           return getRandomRecommendation(pokle, greediness);

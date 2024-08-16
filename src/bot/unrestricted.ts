@@ -1,38 +1,48 @@
-import { sumBy } from "lodash";
+import { fork } from "child_process";
+import { orderBy, sumBy } from "lodash";
 import {
   ChoiceWithRecommendation,
   getChoicesWithRecommendations,
-  getChoiceWithRecommendation,
   getRecommendationIndex,
   Greediness,
 } from "../entropy/entropy";
-import { Card } from "../poker/Card";
+import { Card, CardString } from "../poker/Card";
 import { BoardCards, FlopCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 import { Recommendation } from "./Recommendation";
+import { ChildrenMessage } from "./slowking";
+
+export type ParentMessage = {
+  pokle: {
+    validCards: CardString[];
+    remainingBoards: [
+      CardString,
+      CardString,
+      CardString,
+      CardString,
+      CardString
+    ][];
+  };
+  greediness: number;
+  sliceStart: number;
+  sliceEnd: number;
+};
+
+const NB_OF_CP = 4;
 
 /**
  * Slowking evaluate all 27 million possibles guesses
  */
-export const getSlowkingRecommendation = (
+export const getSlowkingRecommendation = async (
   pokle: Pick<Pokle, "validCards" | "remainingBoards">,
   greediness: Greediness
-) => {
+): Promise<Recommendation> => {
   const cards = pokle.validCards;
-  const boards = pokle.remainingBoards;
-  if (cards === null || boards === null) {
+  if (cards === null) {
     throw new Error("Pokle must be solved first");
   }
-  if (boards.length === 1) {
-    return {
-      choice: boards[0],
-      entropy: 0,
-      probabilityOfBeingAnswer: 1,
-      recommendationIndex: 1,
-    };
-  }
 
-  const playedBoards: BoardCards[] = [];
+  let nbOfPossibleGuesses = 0;
   for (let i = 0; i < cards.length; i++) {
     for (let j = i + 1; j < cards.length; j++) {
       for (let k = j + 1; k < cards.length; k++) {
@@ -44,33 +54,59 @@ export const getSlowkingRecommendation = (
             if (i === m || j === m || k === m || l === m) {
               continue;
             }
-            playedBoards.push([
-              cards[i],
-              cards[j],
-              cards[k],
-              cards[m],
-              cards[l],
-            ]);
+            nbOfPossibleGuesses++;
           }
         }
       }
     }
   }
 
-  return getChoiceWithRecommendation({
-    choices: playedBoards,
-    possibleAnswers: boards,
-    getOutcome: (board1, board2) =>
-      Pokle.getBoardPattern(
-        board1,
-        board2,
-        pokle.remainingBoards as BoardCards[]
-      ).join(""),
-    getProbabilityOfBeingAnswer: (outcomes) => {
-      return (outcomes["🟩🟩🟩🟩🟩"] ?? 0) / boards.length;
-    },
-    greediness,
-  });
+  const recommendations = await Promise.all(
+    [...Array(NB_OF_CP)].map(async (_, i) => {
+      const childProcess = fork("./src/bot/slowking.ts");
+
+      const sliceStart = i * Math.ceil(nbOfPossibleGuesses / NB_OF_CP);
+      const sliceEnd = (i + 1) * Math.ceil(nbOfPossibleGuesses / NB_OF_CP);
+
+      const parentMessage: ParentMessage = {
+        pokle: {
+          validCards: pokle.validCards?.map((c) => c.toString()) ?? [],
+          remainingBoards:
+            pokle.remainingBoards?.map(([a, b, c, d, e]) => [
+              a.toString(),
+              b.toString(),
+              c.toString(),
+              d.toString(),
+              e.toString(),
+            ]) ?? [],
+        },
+        greediness,
+        sliceStart,
+        sliceEnd,
+      };
+
+      childProcess.send(parentMessage);
+      const childrenMessage = await new Promise<ChildrenMessage>((resolve) => {
+        childProcess.on("message", (childrenMessage: ChildrenMessage) => {
+          resolve(childrenMessage);
+        });
+      });
+      console.log(`Process from ${sliceStart} to ${sliceEnd} done`);
+
+      childProcess.kill();
+
+      const recommendation: Recommendation = {
+        choice: childrenMessage.choice.map((c) =>
+          Card.fromString(c)
+        ) as BoardCards,
+        entropy: childrenMessage.entropy,
+        probabilityOfBeingAnswer: childrenMessage.probabilityOfBeingAnswer,
+        recommendationIndex: childrenMessage.recommendationIndex,
+      };
+      return recommendation;
+    })
+  );
+  return orderBy(recommendations, "recommendationIndex", "desc")[0];
 };
 
 export const getFlopsWithRecommendations = (
@@ -212,14 +248,6 @@ export const getUnrestrictedRecommendation = (
   const boards = pokle.remainingBoards;
   if (cards === null || boards === null) {
     throw new Error("Pokle must be solved first");
-  }
-  if (boards.length === 1) {
-    return {
-      choice: boards[0],
-      entropy: 0,
-      probabilityOfBeingAnswer: 1,
-      recommendationIndex: 1,
-    };
   }
 
   const flopsWithRecommendation = getFlopsWithRecommendations(

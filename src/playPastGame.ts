@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { getRecommendation, Mode, modeLabel } from "./bot";
+import { getRecommendation, Mode } from "./bot";
 import { BoardCards } from "./poker/Poker";
 import { Player, Pokle } from "./pokle/Pokle";
 
@@ -36,7 +36,7 @@ const main = async (gameId: number, mode: Mode) => {
     // console.info("Possible boards:", (pokle.remainingBoards ?? []).length);
 
     for (let guessNumber = 1; guessNumber <= 12; guessNumber++) {
-      const nextGuess = getRecommendation(mode, guessNumber, pokle);
+      const nextGuess = await getRecommendation(mode, guessNumber, pokle);
 
       console.info(
         `Playing: ${JSON.stringify(
