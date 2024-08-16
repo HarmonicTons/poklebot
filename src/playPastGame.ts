@@ -77,7 +77,7 @@ const main = async (gameId: number, mode: Mode) => {
 
   const averageGuesses =
     nbGuesses.reduce((a, b) => a + b, 0) / nbGuesses.length;
-  console.info(`Average number of guesses: ${averageGuesses.toFixed(2)}`);
+  console.info(`Average number of guesses: ${averageGuesses.toFixed(3)}`);
   const medianGuesses = nbGuesses.sort((a, b) => a - b)[
     Math.floor(nbGuesses.length / 2)
   ];

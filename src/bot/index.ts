@@ -29,10 +29,14 @@ export const modeLabel: Record<Mode, string> = {
   slowking: "Slowking 👑🐚",
 };
 
+const getGreediness = (guessNumber: number): Greediness => {
+  return 0.5;
+};
+
 export const getRecommendation = memoize(
   (mode: Mode, guessNumber: number, pokle: Pokle) => {
     // increase greediness each turn
-    const greediness: Greediness = 0.5 + guessNumber * 0.1;
+    const greediness: Greediness = getGreediness(guessNumber);
     const recommendation: Recommendation = (() => {
       switch (mode) {
         case "random":
