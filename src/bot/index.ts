@@ -30,6 +30,10 @@ export const modeLabel: Record<Mode, string> = {
 };
 
 const getGreediness = (guessNumber: number): Greediness => {
+  if (guessNumber === 6) {
+    // last chance to not lose, play the most likely board
+    return 0.99;
+  }
   return 0.5;
 };
 
