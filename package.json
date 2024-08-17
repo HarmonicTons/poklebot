@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -P tsconfig.json src/index.ts",
-    "past-game": "node --max-old-space-size=8192 -- node_modules/.bin/ts-node -P tsconfig.json src/playPastGame.ts"
+    "start": "ts-node src/index.ts",
+    "past-game": "ts-node src/playPastGame.ts"
   },
   "author": "",
   "license": "ISC",

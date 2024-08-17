@@ -28,7 +28,7 @@ export type ParentMessage = {
   sliceEnd: number;
 };
 
-const NB_OF_CP = 4;
+const NB_OF_CP = 6;
 
 /**
  * Slowking evaluate all 27 million possibles guesses
