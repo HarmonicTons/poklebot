@@ -86,3 +86,14 @@ export const getGreedyRecommendation = (
   const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 0.99);
   return boardsWithRecommendation[0];
 };
+
+/**
+ * Unhurried mode will always return the option with the higher entropy.
+ */
+export const getUnhurriedRecommendation = (
+  pokle: Pick<Pokle, "remainingBoards">
+): Recommendation => {
+  // greediness at 0.01 instead of 0 to choose the best probability when same entropy
+  const boardsWithRecommendation = getBoardsWithRecommendations(pokle, 0.01);
+  return boardsWithRecommendation[0];
+};
