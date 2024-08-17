@@ -61,6 +61,10 @@ export const getSlowkingRecommendation = async (
     }
   }
 
+  console.info(
+    `Splitting all ${nbOfPossibleGuesses} possible guesses into ${NB_OF_CP} threads`
+  );
+
   const recommendations = await Promise.all(
     [...Array(NB_OF_CP)].map(async (_, i) => {
       const childProcess = fork("./src/bot/slowking.ts");
@@ -91,7 +95,7 @@ export const getSlowkingRecommendation = async (
           resolve(childrenMessage);
         });
       });
-      console.log(`Process from ${sliceStart} to ${sliceEnd} done`);
+      console.log(`Thread #${i} done`);
 
       childProcess.kill();
 

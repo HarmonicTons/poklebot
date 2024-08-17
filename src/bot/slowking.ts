@@ -75,9 +75,6 @@ const main = async () => {
       resolve(parentMessage);
     });
   });
-  console.log(
-    `New child process looking from ${parentMessage.sliceStart} to ${parentMessage.sliceEnd}`
-  );
   const recommendation: Recommendation = await getSlowkingRecommendation(
     {
       validCards: parentMessage.pokle.validCards.map((c) => Card.fromString(c)),
