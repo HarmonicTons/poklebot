@@ -12,6 +12,8 @@ import {
   getSlowkingRecommendation,
   getUnrestrictedRecommendation,
 } from "./unrestricted";
+import { Card } from "../poker/Card";
+import { BoardCards } from "../poker/Poker";
 
 export type Mode =
   | "random"
@@ -41,6 +43,7 @@ const getGreediness = (guessNumber: number): Greediness => {
 
 export const getRecommendation = memoize(
   async (mode: Mode, guessNumber: number, pokle: Pokle) => {
+    // shortcut for when there's only one board left
     if (pokle.remainingBoards?.length === 1) {
       return {
         choice: pokle.remainingBoards[0],
@@ -49,6 +52,37 @@ export const getRecommendation = memoize(
         recommendationIndex: 1,
       };
     }
+
+    // shortcut for when there are only two boards left and they are both ok thanks to autocorrect
+    if (pokle.remainingBoards?.length === 2) {
+      const mutualResult = Pokle.getBoardPattern(
+        pokle.remainingBoards[0],
+        pokle.remainingBoards[1],
+        pokle.remainingBoards as BoardCards[]
+      ).join("");
+      const autocorrected = mutualResult === "🟩🟩🟩🟩🟩";
+      if (autocorrected) {
+        return {
+          choice: pokle.remainingBoards[0],
+          entropy: NaN,
+          probabilityOfBeingAnswer: 1,
+          recommendationIndex: 1,
+        };
+      }
+    }
+
+    // shortcut for slowking when generating stats
+    // if (pokle.remainingBoards?.length === 216) {
+    //   return {
+    //     choice: ["5♣", "5♥", "5♦", "9♦", "8♥"].map((c) =>
+    //       Card.fromString(c as any)
+    //     ) as BoardCards,
+    //     entropy: NaN,
+    //     probabilityOfBeingAnswer: NaN,
+    //     recommendationIndex: NaN,
+    //   };
+    // }
+
     // increase greediness each turn
     const greediness: Greediness = getGreediness(guessNumber);
     const recommendation = (() => {
