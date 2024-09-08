@@ -530,8 +530,6 @@ export class Pokle {
       throw new Error("Pokle must be solved before");
     }
 
-    const pokleSummary = `#Poklebot #${this.gameId} - ${this.validBoards.length} possible solutions`;
-
     const patterns = this.guesses
       .map(
         (guess) =>
@@ -545,7 +543,11 @@ export class Pokle {
       .map((guess) => guess.playedBoard.join(" "))
       .join("\n");
 
-    return pokleSummary + "\n" + patterns + "\n\nGuesses:\n" + playedBoards;
+    return `#Poklebot #${this.gameId} - ${this.validBoards.length} possible solutions
+${patterns}
+
+Guesses:
+||${playedBoards}||`;
   }
 
   public toJSON() {
