@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "start": "ts-node src/index.ts",
-    "past-game": "ts-node src/playPastGame.ts"
+    "past-game": "ts-node src/playPastGame.ts",
+    "wordle": "ts-node src/wordle/main.ts"
   },
   "author": "",
   "license": "ISC",
