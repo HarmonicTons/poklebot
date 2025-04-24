@@ -1,5 +1,3 @@
-import { wordleWords } from "./words";
-
 const LETTER_PATTERNS = ["🟩", "🟨", "⬜️"] as const;
 export type LetterPattern = (typeof LETTER_PATTERNS)[number];
 export type WordPattern = [

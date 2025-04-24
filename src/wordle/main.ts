@@ -1,15 +1,34 @@
 import { getChoicesWithRecommendations } from "../entropy/entropy";
 import { isValidHardModeGuess, playGuess } from "./utils";
-import { wordleWords, passedWords } from "./words";
+import { passedWords, allScrabbleWords } from "./words";
 
 const main = async () => {
-  const remainingWords = wordleWords.filter(
-    (word) => !passedWords.includes(word)
+  console.log(`All scrabble 5 letters words: ${allScrabbleWords.length}`);
+  console.log(`Passed wordle words: ${passedWords.length}`);
+  const allConsonnes = "bcdfghjklmnpqrstvwxsz".split("");
+  const onlyConsonnesWords = allScrabbleWords.filter(
+    (w) =>
+      allConsonnes.includes(w[0]) &&
+      allConsonnes.includes(w[1]) &&
+      allConsonnes.includes(w[2]) &&
+      allConsonnes.includes(w[3]) &&
+      allConsonnes.includes(w[4])
   );
-  console.log(`Remaining words: ${remainingWords.length}`);
+  console.log(`Words only made of consonnes: ${onlyConsonnesWords.length}`);
+  const pluralWords = allScrabbleWords.filter(
+    (w) => (w.endsWith("s") && allConsonnes.includes(w[3])) || w.endsWith("es")
+  );
+  console.log(`Words finishing by ES or "consonne + S": ${pluralWords.length}`);
+
+  const validWords = allScrabbleWords
+    .filter((word) => !onlyConsonnesWords.includes(word))
+    .filter((word) => !passedWords.includes(word))
+    .filter((word) => !pluralWords.includes(word));
+
+  console.log(`Remaining valid words: ${validWords.length}`);
   const res = getChoicesWithRecommendations({
-    choices: remainingWords,
-    possibleAnswers: remainingWords,
+    choices: validWords,
+    possibleAnswers: validWords,
     getOutcome: (answer, guess) => playGuess({ answer, guess }).join(""),
     getProbabilityOfBeingAnswer: () => 0,
     greediness: 0,
@@ -17,7 +36,21 @@ const main = async () => {
   });
   console.log(
     res
-      .map(({ choice, entropy }) => `${choice} ${entropy.toFixed(2)}`)
+      .map(
+        ({ choice, entropy }) =>
+          `${choice.toUpperCase()} (${entropy.toFixed(2)})`
+      )
+      .slice(0, 5)
+      .join("\n")
+  );
+  console.log("...");
+  console.log(
+    res
+      .map(
+        ({ choice, entropy }) =>
+          `${choice.toUpperCase()} (${entropy.toFixed(2)})`
+      )
+      .slice(-5)
       .join("\n")
   );
   // for (const firstGuess of [...wordleWords].splice(0, 100)) {
