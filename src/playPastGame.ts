@@ -1,9 +1,13 @@
 import fs from "fs/promises";
 import { getRecommendation, Mode } from "./bot";
-import { BoardCards } from "./poker/Poker";
+import { BoardCards, getBoardFromJson } from "./poker/Poker";
 import { Player, Pokle } from "./pokle/Pokle";
 
-const main = async (gameId: number, mode: Mode) => {
+const main = async (
+  gameId: number,
+  mode: Mode,
+  playAllPossibleGames = true
+) => {
   console.info(`Fetching Pokle #${gameId} from history...`);
 
   // get the game from the history
@@ -11,7 +15,11 @@ const main = async (gameId: number, mode: Mode) => {
     await fs.readFile("./src/history/games.json", "utf-8")
   ).toString();
   const { games } = JSON.parse(gamesHistory) as {
-    games: { gameId: number; players: Player[] }[];
+    games: {
+      gameId: number;
+      players: Player[];
+      solution: [string, string, string, string, string];
+    }[];
   };
   const game = games.find((game) => game.gameId === gameId);
   if (!game) {
@@ -22,7 +30,9 @@ const main = async (gameId: number, mode: Mode) => {
 
   await pokle.solve();
 
-  const solutions = pokle.validBoards as BoardCards[];
+  const solutions = playAllPossibleGames
+    ? (pokle.validBoards as BoardCards[])
+    : [getBoardFromJson(game.solution)];
   const nbGuesses = [];
 
   for (const solutionIndex in solutions) {
