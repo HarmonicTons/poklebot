@@ -21,11 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Affiche la version de Node, TypeScript et ts-node
-        run: |
-          node --version
-          npx tsc --version
-          npx ts-node --version
+      - name: Affiche les 40 premières lignes de src/index.ts
+        run: head -40 src/index.ts
 
       - name: Solve pokle
         run: npm run start -- restricted
