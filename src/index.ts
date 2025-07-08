@@ -12,7 +12,7 @@ import {
 import { Player, Pokle } from "./pokle/Pokle";
 import { Card } from "./poker/Card";
 
-const main = async (mode: Mode) => {
+const main = async (mode: Mode, debug = false) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -56,7 +56,9 @@ const main = async (mode: Mode) => {
       break;
     }
 
-    await page.screenshot({ path: `screenshots/guess${guessNumber}.png` });
+    if (debug) {
+      await page.screenshot({ path: `screenshots/guess${guessNumber}.png` });
+    }
 
     console.info("Remaining boards:", (pokle.remainingBoards ?? []).length);
   }
