@@ -12,7 +12,7 @@ import {
 import { Player, Pokle } from "./pokle/Pokle";
 import { Card } from "./poker/Card";
 
-const main = async (mode: Mode, debug = false, sendToDiscord = true) => {
+const main = async (mode: Mode, debug = false, sendToDiscord = false) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
