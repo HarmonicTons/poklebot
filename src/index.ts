@@ -10,6 +10,7 @@ import {
   timeout,
 } from "./playwright/utils";
 import { Player, Pokle } from "./pokle/Pokle";
+import { Card } from "./poker/Card";
 
 const main = async (mode: Mode) => {
   console.info("Fetching today's Pokle...");
@@ -32,7 +33,7 @@ const main = async (mode: Mode) => {
 
     console.info(
       `Playing: ${JSON.stringify(
-        nextGuess.choice.map((card) => card.toString())
+        nextGuess.choice.map((card: Card) => card.toString())
       )} - E: ${
         isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
       } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "ts-node --project tsconfig.json src/index.ts",
+    "start": "ts-node src/index.ts",
     "past-game": "ts-node src/playPastGame.ts",
     "wordle": "ts-node src/wordle/main.ts"
   },
