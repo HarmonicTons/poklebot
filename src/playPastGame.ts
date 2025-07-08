@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import { getRecommendation, Mode } from "./bot";
 import { BoardCards, getBoardFromJson } from "./poker/Poker";
 import { Player, Pokle } from "./pokle/Pokle";
+import { Card } from "./poker/Card";
 
 const main = async (
   gameId: number,
@@ -50,7 +51,7 @@ const main = async (
 
       console.info(
         `Playing: ${JSON.stringify(
-          nextGuess.choice.map((card) => card.toString())
+          nextGuess.choice.map((card: Card) => card.toString())
         )} - E: ${
           isNaN(nextGuess.entropy) ? "N/A" : nextGuess.entropy.toFixed(4)
         } - P: ${nextGuess.probabilityOfBeingAnswer.toFixed(4)}`
