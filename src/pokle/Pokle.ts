@@ -533,21 +533,19 @@ export class Pokle {
     const patterns = this.guesses
       .map(
         (guess) =>
-          guess.pattern.join("").replaceAll("⬜️", ":white_large_square:") +
+          guess.pattern.join("") +
           (guess.pattern.join("") === "🟩🟩🟩🟩🟩"
             ? ""
             : " - " + guess.remainingBoards.length + " remaining")
       )
       .join("\n");
-    const playedBoards = this.guesses
-      .map((guess) => guess.playedBoard.join(" "))
-      .join("\n");
 
     return `#Poklebot #${this.gameId} - ${this.validBoards.length} possible solutions
-${patterns}
+${patterns}`;
+  }
 
-Guesses:
-||${playedBoards}||`;
+  public guessesToString(): string {
+    return this.guesses.map((guess) => guess.playedBoard.join(" ")).join("\n");
   }
 
   public toJSON() {

@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import { DateTime } from "luxon";
 import playwright from "playwright";
 import { getRecommendation, Mode, modeLabel } from "./bot";
+import { postGame } from "./discord/postMessage";
 import {
   closeAllModals,
   getPlayers,
@@ -67,10 +68,6 @@ const main = async (mode: Mode) => {
 
   await browser.close();
 
-  console.info("-------");
-  console.info(`Playing as: ${modeLabel[mode]}`);
-  console.info(pokle.toString());
-
   // add the game to the history
   const gamesHistory = (
     await fs.readFile("./src/history/games.json", "utf-8")
@@ -83,6 +80,9 @@ const main = async (mode: Mode) => {
     games.push(pokle.toJSON());
     await fs.writeFile("./src/history/games.json", JSON.stringify({ games }));
   }
+
+  await postGame(pokle);
+  console.info("Posted game to Discord");
 };
 
 if (process.argv.length < 3) {
