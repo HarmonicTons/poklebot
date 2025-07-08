@@ -1,10 +1,9 @@
+import { Card } from "../poker/Card";
+import { BoardCards, getBoardFromJson } from "../poker/Poker";
 import {
   getFlopsWithRecommendations,
   getUnrestrictedRecommendation,
 } from "./unrestricted";
-import { Card } from "../poker/Card";
-import { BoardCards, getBoardFromJson } from "../poker/Poker";
-import { getBoardsWithRecommendations } from "./restricted";
 
 describe("unrestricted bot", () => {
   it("2 remainings boards", () => {

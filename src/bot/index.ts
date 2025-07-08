@@ -1,5 +1,6 @@
 import memoize from "memoizee";
 import { Greediness } from "../entropy/entropy";
+import { BoardCards } from "../poker/Poker";
 import { Pokle } from "../pokle/Pokle";
 import {
   getGreedyRecommendation,
@@ -12,8 +13,6 @@ import {
   getSlowkingRecommendation,
   getUnrestrictedRecommendation,
 } from "./unrestricted";
-import { Card } from "../poker/Card";
-import { BoardCards } from "../poker/Poker";
 
 export type Mode =
   | "random"
