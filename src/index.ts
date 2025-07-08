@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import { DateTime } from "luxon";
 import playwright from "playwright";
 import { getRecommendation, Mode, modeLabel } from "./bot";
-import { postGame } from "./discord/postMessage";
+import { postGameOnDiscord } from "./discord/postMessage";
 import {
   closeAllModals,
   getPlayers,
@@ -12,7 +12,7 @@ import {
 import { Player, Pokle } from "./pokle/Pokle";
 import { Card } from "./poker/Card";
 
-const main = async (mode: Mode, debug = false) => {
+const main = async (mode: Mode, debug = false, sendToDiscord = true) => {
   console.info("Fetching today's Pokle...");
   const browser = await playwright.chromium.launch();
   const context = await browser.newContext();
@@ -84,8 +84,10 @@ const main = async (mode: Mode, debug = false) => {
     await fs.writeFile("./src/history/games.json", JSON.stringify({ games }));
   }
 
-  await postGame(pokle);
-  console.info("Posted game to Discord");
+  if (sendToDiscord) {
+    await postGameOnDiscord(pokle);
+    console.info("Posted game to Discord");
+  }
 };
 
 if (process.argv.length < 3) {

@@ -25,7 +25,7 @@ const parseMessage = (msg: string): string => {
   return msg.replaceAll("⬜️", ":white_large_square:");
 };
 
-export const postGame = async (pokle: Pokle) => {
+export const postGameOnDiscord = async (pokle: Pokle) => {
   const discordMessage = `${pokle.toString()}\n\nGuesses:\n||${pokle.guessesToString()}||`;
   postMessage(discordMessage);
 };
