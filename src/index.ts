@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import { DateTime } from "luxon";
-import playwright from "playwright";
+import playwright, { Browser } from "playwright";
 import { getRecommendation, Mode, modeLabel } from "./bot";
 import { postGameOnDiscord } from "./discord/postMessage";
 import {
@@ -12,16 +12,18 @@ import {
 import { Player, Pokle } from "./pokle/Pokle";
 import { Card } from "./poker/Card";
 
-const main = async (mode: Mode, debug = false, sendToDiscord = true) => {
-  console.info("Fetching today's Pokle...");
-  const browser = await playwright.chromium.launch();
+const play = async (
+  browser: Browser,
+  gameId: number,
+  mode: Mode,
+  debug: boolean
+): Promise<Pokle> => {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("https://poklegame.com/");
   await closeAllModals(page);
   const players = await getPlayers(page);
 
-  const gameId = Pokle.getGameIdFromDate(DateTime.now());
   const pokle = new Pokle(gameId, players);
   await pokle.solve();
 
@@ -67,7 +69,19 @@ const main = async (mode: Mode, debug = false, sendToDiscord = true) => {
     await timeout(3000);
     await page.screenshot({ path: "screenshots/statsScreen.png" });
   }
-  await browser.close();
+  return pokle;
+};
+
+const main = async (mode: Mode, debug = false, sendToDiscord = true) => {
+  console.info("Fetching today's Pokle...");
+  const gameId = Pokle.getGameIdFromDate(DateTime.now());
+  const browser = await playwright.chromium.launch();
+  let pokle: Pokle;
+  try {
+    pokle = await play(browser, gameId, mode, debug);
+  } finally {
+    await browser.close();
+  }
 
   // add the game to the history
   const gamesHistory = (
@@ -93,4 +107,7 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-main(process.argv[2] as Mode).catch(console.error);
+main(process.argv[2] as Mode).catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

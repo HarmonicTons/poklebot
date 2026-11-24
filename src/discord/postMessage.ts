@@ -27,5 +27,5 @@ const parseMessage = (msg: string): string => {
 
 export const postGameOnDiscord = async (pokle: Pokle) => {
   const discordMessage = `${pokle.toString()}\n\nGuesses:\n||${pokle.guessesToString()}||`;
-  postMessage(discordMessage);
+  await postMessage(discordMessage);
 };
